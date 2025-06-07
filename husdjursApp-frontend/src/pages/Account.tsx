@@ -2,12 +2,10 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import PetForm from "../components/PetForm";
 import UserForm from "../components/UserForm";
-import HealthForm from "../components/HealthForm";
-import HealthList from "../components/HealthList";
-import PetCareForm from "../components/PetCareForm";
-import PetCareList from "../components/PetCareList";
+import HealthPage from "./HealthPage";
+
 import { Link } from "react-router-dom";
-import { FaEdit, FaTrash, FaPaw, FaHeart, FaPlus } from "react-icons/fa";
+import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
 
 //  Typdefinitioner för användare och husdjur
@@ -37,16 +35,9 @@ function Account() {
   const [editingPet, setEditingPet] = useState<Pet | null>(null);
   const [editUserMode, setEditUserMode] = useState(false);
 
-  const [showHealthPetId, setShowHealthPetId] = useState<number | null>(null);
-  const [showHealthForm, setShowHealthForm] = useState(false);
-  const [healthRefreshKey] = useState(0); // För att kunna trigga refresh
-
-  const [showCarePetId, setShowCarePetId] = useState<number | null>(null);
-  const [careRefreshKey, setCareRefreshKey] = useState(0);
-
   // När ett nytt husdjur skapas, lägg till det i listan
   const handlePetCreated = (newPet: Pet) => {
-    setPets((prev) => [...prev, newPet]);
+    setPets(prev => [...prev, newPet]);
     setShowForm(false);
   };
 
@@ -54,7 +45,7 @@ function Account() {
   const handleDelete = async (id: number) => {
     try {
       await axios.delete(`http://localhost:5000/pets/${id}`);
-      setPets((prev) => prev.filter((p) => p.id !== id));
+      setPets(prev => prev.filter(p => p.id !== id));
     } catch (error) {
       console.error("Kunde inte ta bort husdjuret:", error);
     }
@@ -62,13 +53,13 @@ function Account() {
 
   // Funktion för att hämta djur från databasen
   const refreshingPets = () => {
-    axios.get("http://localhost:5000/pets").then((res) => {
+    axios.get("http://localhost:5000/pets").then(res => {
       setPets(res.data);
     });
   };
 
   useEffect(() => {
-    axios.get("http://localhost:5000/users").then((res) => {
+    axios.get("http://localhost:5000/users").then(res => {
       const found = res.data.find((u: User) => u.id === 2);
       setUser(found);
     });
@@ -97,7 +88,7 @@ function Account() {
                   email={user.email}
                   onEditDone={() => {
                     setEditUserMode(false);
-                    axios.get("http://localhost:5000/users").then((res) => {
+                    axios.get("http://localhost:5000/users").then(res => {
                       const found = res.data.find((u: User) => u.id === 2);
                       setUser(found);
                     });
@@ -132,7 +123,7 @@ function Account() {
                   className="Pet-Container"
                   style={{ flexWrap: "wrap", gap: "1rem" }}
                 >
-                  {pets.map((pet) => (
+                  {pets.map(pet => (
                     <div
                       key={pet.id}
                       style={{
@@ -153,51 +144,6 @@ function Account() {
                           }}
                           onPetCreated={handlePetCreated}
                         />
-                      ) : showHealthPetId === pet.id ? (
-                        <>
-                          {/*  Hälsoformulär och lista */}
-                          {showHealthForm ? (
-                            <HealthForm
-                              petId={pet.id}
-                              onSaved={() => {
-                                refreshingPets();
-                                setShowHealthForm(false);
-                              }}
-                            />
-                          ) : (
-                            <button onClick={() => setShowHealthForm(true)}>
-                              Lägg till hälsopost
-                            </button>
-                          )}
-                          <HealthList
-                            petId={pet.id}
-                            petName={pet.name}
-                            refreshKey={healthRefreshKey}
-                          />
-                          <button onClick={() => setShowHealthPetId(null)}>
-                            Tillbaka till info
-                          </button>
-                        </>
-                      ) : showCarePetId === pet.id ? (
-                        <>
-                          {/* Skötselkomponenter */}
-                          {pet.id && (
-                            <PetCareForm
-                              petId={pet.id}
-                              onSaved={() =>
-                                setCareRefreshKey((prev) => prev + 1)
-                              }
-                            />
-                          )}
-                          <PetCareList
-                            petId={pet.id}
-                            petName={pet.name}
-                            refreshKey={careRefreshKey}
-                          />
-                          <button onClick={() => setShowCarePetId(null)}>
-                            Tillbaka till info
-                          </button>
-                        </>
                       ) : (
                         <>
                           {/* Visning av djurets information */}
@@ -232,12 +178,6 @@ function Account() {
                           <button onClick={() => handleDelete(pet.id)}>
                             Ta bort <FaTrash />
                           </button>
-                          <button onClick={() => setShowHealthPetId(pet.id)}>
-                            Djurhälsa <FaHeart />
-                          </button>
-                          <button onClick={() => setShowCarePetId(pet.id)}>
-                            Skötsel <FaPaw />
-                          </button>
                         </>
                       )}
                     </div>
@@ -251,7 +191,7 @@ function Account() {
               <button
                 onClick={() => {
                   setEditingPet(null);
-                  setShowForm((prev) => !prev);
+                  setShowForm(prev => !prev);
                 }}
               >
                 {showForm ? (
@@ -266,6 +206,7 @@ function Account() {
           )}
         </div>
       </div>
+      <HealthPage></HealthPage>
     </div>
   );
 }
