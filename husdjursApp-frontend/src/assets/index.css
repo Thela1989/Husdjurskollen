@@ -2,25 +2,61 @@
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  width: 100vw;
-
   color-scheme: light dark;
   color: rgb(0, 0, 0);
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+html,
 body {
+  overscroll-behavior: none;
+}
+
+html {
+  min-height: 100%;
   background-image: url("/testbilder/background.jpg");
-  background-size: contain;
   background-repeat: no-repeat;
-  background-position: top center;
+  background-size: cover;
+  background-position: center top;
   background-attachment: fixed;
+  background-color: #000;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  font-family: inherit;
+  background: transparent;
+  overflow-x: hidden;
+}
+
+.PetCare-List {
+  list-style: none;
+}
+.hero-section {
   min-height: 100vh;
   display: flex;
   justify-content: center;
+  align-items: flex-start;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.welcomeText {
+  color: #fff;
+  font-size: 70px;
+  margin-top: 70px;
+  text-shadow: 10px 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+#WelcomeP {
+  color: #ffffff;
+  font-size: 40px;
+  margin-top: 100px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
 }
 
 .account-container {
@@ -29,46 +65,46 @@ body {
   justify-content: center;
   position: relative;
   z-index: 1;
-
-  margin: 2rem;
+  max-width: 90vw;
+  margin: 2rem auto;
   padding: 1.5rem;
   background-color: rgba(255, 255, 255, 0.85);
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
 }
 
-.BackBtn {
-  color: #000000;
+@media (max-width: 480px) {
+  .account-container {
+    padding: 1rem;
+    margin: 1rem auto;
+    max-width: 95vw;
+  }
+
+  h1 {
+    font-size: 1.25rem;
+  }
+
+  button {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+  }
+
+  .welcomeText {
+    font-size: 2rem;
+    margin-top: 40px;
+  }
+
+  #WelcomeP {
+    font-size: 1.2rem;
+    margin-top: 40px;
+  }
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-button:hover {
-  background-color: #444;
-  color: white;
-  transition: 0.3s;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-p {
-  font-size: 0px;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0);
+@media (min-width: 768px) {
+  .account-container {
+    max-width: 400px;
+  }
 }
 
 button {
@@ -78,47 +114,31 @@ button {
   padding: 0.6em 1.2em;
   font-size: 0.8em;
   font-weight: 500;
-  font-family: inherit;
   background-color: #1a1a1a;
+  color: white;
   cursor: pointer;
   transition: border-color 0.25s;
   margin: 5px;
 }
 
-.Pet-Container button {
-  height: 40px;
-
-  padding: 0;
-}
-
 button:hover {
+  background-color: #444;
   border-color: #646cff;
 }
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-.welcomeText {
-  position: relative;
-  top: -100px; /* Flyttar upp rubriken */
-  text-align: center;
-  color: #fff;
-  font-size: 70px;
-  text-shadow: 10px 2px 6px rgba(0, 0, 0, 0.6);
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
 }
 
-#WelcomeP {
-  color: #ffffff;
-  font-size: 40px;
-
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-}
-
-.PetInfo p {
-  color: rgb(0, 0, 0);
-  font-size: 18px;
-  line-height: 1.6;
+a:hover {
+  color: #535bf2;
 }
 
 .HomeContainer {
@@ -127,38 +147,55 @@ button:focus-visible {
   text-align: center;
   justify-content: center;
   margin-bottom: 100px;
-
-  button {
-    border-color: #fff;
-    width: 180px;
-    margin-bottom: 140px;
-  }
 }
+
 .HomeContainer .button-row {
   display: flex;
   justify-content: center;
   gap: 1rem;
   margin-top: 1rem;
+  flex-wrap: wrap;
+}
+.button-row button {
+  border: solid white 1.5px;
 }
 
-.Pet-Container button {
-  width: 100px;
+p {
+  font-size: 0;
+  text-shadow: none;
 }
+
+.PetInfo p {
+  color: rgb(0, 0, 0);
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+.icon-spacing {
+  margin-right: 4px;
+}
+
+input {
+  border-radius: 5px;
+  color: #ffffff;
+  background-color: #1a1a1a;
+  padding: 0.5rem;
+}
+
+::placeholder {
+  color: #ffffff8a;
+}
+
 .Pet-Container {
   display: flex;
   justify-content: center;
   align-items: center;
 }
-.icon-spacing {
-  margin-right: 4px;
-}
-input {
-  border-radius: 5px;
-  color: #ffffff;
-  background-color: #1a1a1a;
-}
-::placeholder {
-  color: #ffffff8a;
+
+.Pet-Container button {
+  height: 40px;
+  width: 100px;
+  padding: 0;
 }
 
 span.Plus-Icon {

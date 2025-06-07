@@ -20,8 +20,8 @@ function PetCareList({ petId, petName, refreshKey }: Props) {
       await axios.put(`http://localhost:5000/petcare/${entry.id}`, {
         done: !entry.done,
       });
-      setCareEntries(prev =>
-        prev.map(e => (e.id === entry.id ? { ...e, done: !e.done } : e))
+      setCareEntries((prev) =>
+        prev.map((e) => (e.id === entry.id ? { ...e, done: !e.done } : e))
       );
     } catch (error) {
       console.error("Kunde inte uppdatera skötselstatus:", error);
@@ -31,7 +31,7 @@ function PetCareList({ petId, petName, refreshKey }: Props) {
   const handleDelete = async (id: number) => {
     try {
       await axios.delete(`http://localhost:5000/petcare/${id}`);
-      setCareEntries(prev => prev.filter(entry => entry.id !== id));
+      setCareEntries((prev) => prev.filter((entry) => entry.id !== id));
     } catch (error) {
       console.error("Kunde inte ta bort skötseluppgift:", error);
     }
@@ -40,8 +40,8 @@ function PetCareList({ petId, petName, refreshKey }: Props) {
   useEffect(() => {
     axios
       .get(`http://localhost:5000/petcare?petId=${petId}`)
-      .then(res => setCareEntries(res.data))
-      .catch(err => console.error("Fel vid hämtning:", err));
+      .then((res) => setCareEntries(res.data))
+      .catch((err) => console.error("Fel vid hämtning:", err));
   }, [petId, refreshKey]);
 
   return (
@@ -51,8 +51,9 @@ function PetCareList({ petId, petName, refreshKey }: Props) {
         <p>Inga uppgifter.</p>
       ) : (
         <ul>
-          {careEntries.map(entry => (
+          {careEntries.map((entry) => (
             <li
+              className="PetCare-List"
               key={entry.id}
               style={{ textDecoration: entry.done ? "line-through" : "none" }}
             >

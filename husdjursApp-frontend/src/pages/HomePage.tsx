@@ -4,9 +4,9 @@ import { FaPaw } from "react-icons/fa";
 
 function HomePage() {
   const navigate = useNavigate();
-
+  // Navigerar till testkontot
   const handleLoginClick = () => {
-    navigate("/account"); // Navigerar till testkontot
+    navigate("/account");
   };
 
   const handleRegisterClick = () => {
@@ -14,10 +14,10 @@ function HomePage() {
   };
 
   return (
-    <div className="HomeContainer">
-      <div className="center-content" style={{ padding: "2rem" }}>
+    <div className="hero-section">
+      <div className="hero-content">
         <h1 className="welcomeText">
-          Husdjurskollen <FaPaw />{" "}
+          Husdjurskollen <FaPaw />
         </h1>
         <p id="WelcomeP">Håll koll på ditt husdjurs vardag, behov och hälsa!</p>
 

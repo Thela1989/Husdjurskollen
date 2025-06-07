@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// GET endast testanvändaren
+// GETanrop endast testanvändaren
 app.get("/users", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM users WHERE id = $1;", [2]);
@@ -21,7 +21,7 @@ app.get("/users", async (req, res) => {
     res.status(500).send("Serverfel");
   }
 });
-
+//Lägger in ny användare
 app.post("/users", async (req, res) => {
   const { name, email, password } = req.body;
   try {
@@ -35,7 +35,7 @@ app.post("/users", async (req, res) => {
     res.status(500).send("Server error");
   }
 });
-
+//Skickar put anrop när man redigera användare
 app.put("/users/2", async (req, res) => {
   const { name, email } = req.body;
 
@@ -112,44 +112,13 @@ app.delete("/pets/:id", async function (req, res) {
   }
 });
 
-//Hämta skötsel för husdjur
-app.get("/Petcare", async (req, res) => {
-  const petId = req.query.petId;
-
-  try {
-    const result = await pool.query("SELECT * FROM petcare WHERE pet_id =$1", [
-      petId,
-    ]);
-    res.json(result.rows);
-  } catch (error) {
-    console.error("Fel vid hämtning av skötsel", (error as Error).message);
-    res.status(500).send("Serverfel");
-  }
-});
-
 //Lägg till ny skötsel
-
-app.post("/petcare", async (req, res) => {
-  const { pet_id, title } = req.body;
-
-  try {
-    const result = await pool.query(
-      "INSERT INTO petcare (pet_id, title) VALUES ($1, $2) RETURNING *",
-      [pet_id, title]
-    );
-    res.status(201).json(result.rows[0]);
-  } catch (error) {
-    console.error("Fel vidskapande av skötsel", (error as Error).message);
-    res.status(500).send("Serverfel");
-  }
-});
 
 //Uppdatera statusen på skötsel
 app.put("/petcare/:id", async (req, res) => {
   const { id } = req.params;
   const { done } = req.body;
 
-  console.log("Uppdaterar petcare", { id, done });
   try {
     const result = await pool.query(
       "UPDATE petcare SET done = $1 WHERE id = $2 RETURNING *",
@@ -240,7 +209,7 @@ app.delete("/health/:id", async (req, res) => {
 
 app.get("/petcare", async (req, res) => {
   const petId = Number(req.query.petId);
-  console.log("🔍 Mottaget petId från query:", petId);
+
   try {
     const result = await pool.query(
       "SELECT * FROM petcare WHERE pet_id = $1 ORDER BY id ASC ",
