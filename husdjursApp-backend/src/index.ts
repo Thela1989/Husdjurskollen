@@ -12,7 +12,8 @@ app.use(cors());
 app.use(express.json());
 
 // GETanrop endast testanvändaren
-app.get("/users", async (req, res) => {
+app.get("/users/:id", async (req, res) => {
+  const { id } = req.params;
   try {
     const result = await pool.query("SELECT * FROM users WHERE id = $1;", [2]);
     res.json(result.rows);
