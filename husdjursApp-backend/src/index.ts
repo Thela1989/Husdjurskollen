@@ -1,7 +1,8 @@
 import dotenv from "dotenv";
 import cors from "cors";
 import pool from "./db";
-import express from "express";
+import express, { Request, Response } from "express";
+import bcrypt from "bcryptjs";
 
 dotenv.config();
 
@@ -11,33 +12,20 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// GETanrop endast testanvändaren
-app.get("/users/:id", async (req, res) => {
+/* === GET: en användare via id === */
+app.get("/users/:id", async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const result = await pool.query("SELECT * FROM users WHERE id = $1;", [2]);
-    res.json(result.rows);
+    const result = await pool.query("SELECT * FROM users WHERE id = $1;", [id]);
+    res.json(result.rows[0]);
   } catch (error) {
     console.error("Felmeddelande:", (error as Error).message);
     res.status(500).send("Serverfel");
   }
 });
-//Lägger in ny användare
-app.post("/users", async (req, res) => {
-  const { name, email, password } = req.body;
-  try {
-    const result = await pool.query(
-      "INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *;",
-      [name, email, password]
-    );
-    res.status(201).json(result.rows[0]);
-  } catch (error) {
-    console.error("Felmeddelande:", (error as Error).message);
-    res.status(500).send("Server error");
-  }
-});
-//Skickar put anrop när man redigera användare
-app.put("/users/2", async (req, res) => {
+
+//Skickar put anrop när man redigerar användare
+app.put("/users/2", async (req: Request, res: Response) => {
   const { name, email } = req.body;
 
   try {
@@ -54,7 +42,7 @@ app.put("/users/2", async (req, res) => {
 });
 
 // GET alla pets för user 2
-app.get("/pets", async function (req, res) {
+app.get("/pets", async (req: Request, res: Response) => {
   const userId = 2;
   try {
     const result = await pool.query("SELECT * FROM pets WHERE owner_id = $1;", [
@@ -67,7 +55,7 @@ app.get("/pets", async function (req, res) {
   }
 });
 
-app.post("/pets", async function (req, res) {
+app.post("/pets", async (req: Request, res: Response) => {
   const { name, type, birth_date, owner_id, breed, gender, color } = req.body;
 
   try {
@@ -84,7 +72,7 @@ app.post("/pets", async function (req, res) {
   }
 });
 
-app.put("/pets/:id", async function (req, res) {
+app.put("/pets/:id", async (req: Request, res: Response) => {
   const { id } = req.params;
   const { name, type, birth_date, owner_id, breed, gender, color } = req.body;
 
@@ -102,7 +90,7 @@ app.put("/pets/:id", async function (req, res) {
   }
 });
 
-app.delete("/pets/:id", async function (req, res) {
+app.delete("/pets/:id", async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     await pool.query("DELETE FROM pets WHERE id = $1", [id]);
@@ -113,10 +101,7 @@ app.delete("/pets/:id", async function (req, res) {
   }
 });
 
-//Lägg till ny skötsel
-
-//Uppdatera statusen på skötsel
-app.put("/petcare/:id", async (req, res) => {
+app.put("/petcare/:id", async (req: Request, res: Response) => {
   const { id } = req.params;
   const { done } = req.body;
 
@@ -132,8 +117,7 @@ app.put("/petcare/:id", async (req, res) => {
   }
 });
 
-//Ta bort skötseluppgift
-app.delete("/petcare/:id", async (req, res) => {
+app.delete("/petcare/:id", async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
@@ -146,7 +130,7 @@ app.delete("/petcare/:id", async (req, res) => {
 });
 
 //Hälsa
-app.get("/health", async (req, res) => {
+app.get("/health", async (req: Request, res: Response) => {
   const petID = req.query.petid;
 
   try {
@@ -156,18 +140,17 @@ app.get("/health", async (req, res) => {
     );
     res.json(result.rows);
   } catch (error) {
-    console.error("Felmvid hämtning av health:", (error as Error).message);
+    console.error("Fel vid hämtning av health:", (error as Error).message);
     res.status(500).send("Serverfel vid hämtning av health");
   }
 });
 
-app.post("/health", async (req, res) => {
+app.post("/health", async (req: Request, res: Response) => {
   const { pet_id, type, description, health_date, vet, notes } = req.body;
   try {
     const result = await pool.query(
       `INSERT INTO health (pet_id, type, description, health_date, vet, notes)
- VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
       [pet_id, type, description, health_date, vet, notes]
     );
     res.status(201).json(result.rows[0]);
@@ -177,7 +160,7 @@ app.post("/health", async (req, res) => {
   }
 });
 
-app.put("/health/:id", async (req, res) => {
+app.put("/health/:id", async (req: Request, res: Response) => {
   const { id } = req.params as { id: string };
   const { pet_id, type, description, health_date, vet, notes } = req.body;
   try {
@@ -194,7 +177,8 @@ app.put("/health/:id", async (req, res) => {
     res.status(500).send("Serverfel vid uppdatering");
   }
 });
-app.delete("/health/:id", async (req, res) => {
+
+app.delete("/health/:id", async (req: Request, res: Response) => {
   const { id } = req.params as { id: string };
 
   try {
@@ -202,13 +186,11 @@ app.delete("/health/:id", async (req, res) => {
     res.status(200).send("Hälsodata raderad");
   } catch (error) {
     console.error("Fel vid borttagning av hälsodata", error);
-    res.status(500).send("Serverfel vid borttagning av hälsodats");
+    res.status(500).send("Serverfel vid borttagning av hälsodata");
   }
 });
 
-//PetCare
-
-app.get("/petcare", async (req, res) => {
+app.get("/petcare", async (req: Request, res: Response) => {
   const petId = Number(req.query.petId);
 
   try {
@@ -222,7 +204,8 @@ app.get("/petcare", async (req, res) => {
     res.status(500).send("Serverfel vid hämtning av skötseldata");
   }
 });
-app.post("/petcare", async (req, res) => {
+
+app.post("/petcare", async (req: Request, res: Response) => {
   const { pet_id, title } = req.body;
   try {
     const result = await pool.query(
@@ -231,8 +214,8 @@ app.post("/petcare", async (req, res) => {
     );
     res.status(201).json(result.rows[0]);
   } catch (error) {
-    console.error("Fel vid skaåpande av skötseluppgift", error);
-    res.status(500).send("serverfel");
+    console.error("Fel vid skapande av skötseluppgift", error);
+    res.status(500).send("Serverfel");
   }
 });
 
