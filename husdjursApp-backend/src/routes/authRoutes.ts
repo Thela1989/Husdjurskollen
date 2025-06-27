@@ -1,6 +1,7 @@
 import { Router, RequestHandler } from "express";
 import bcrypt from "bcryptjs";
 import pool from "../db";
+import { Result } from "pg";
 
 const router = Router();
 
@@ -46,4 +47,34 @@ const registerUser: RequestHandler = async (req, res) => {
 
 router.post("/register", registerUser);
 
+//POST /api/auth/login
+const loginUser: RequestHandler = async (req, res) => {
+  const { name, email, password } = req.body;
+
+  if (!email || !password) {
+    res.status(400).json({ error: "Epost och löseonod krävs" });
+    return;
+  }
+  try {
+    const result = await pool.query("SELECT * FROM users WHERE email = $1", [
+      email,
+    ]);
+
+    if (result.rows.length === 0) {
+      res.status(401).json({ error: "Användare hittades inte" });
+      return;
+    }
+    const user = result.rows[0];
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatch) {
+      res.status(401).json({ Error: "Ogiltige-post eller lösenord" });
+      return;
+    }
+    //Skickar tillbaks användardata (ej lösenord)
+  } catch (error) {
+    console.error("Fel vid loggin:", error);
+    res.status(500).json({ error: "Serverfel vid registrering" });
+  }
+};
 export default router;
