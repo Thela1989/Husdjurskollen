@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import pool from "../db";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 // Registrering
 import { Request, Response } from "express";
@@ -54,8 +55,22 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    //JWT-token
+    const token = jwt.sign(
+      {
+        userId: user.id,
+      },
+      process.env.JWT_SECRET as string,
+      {
+        expiresIn: "2h",
+      }
+    );
+
+    // skickar token i svaret
+
     res.status(200).json({
       message: "Inloggningen lyckades",
+      token,
       user: {
         id: user.id,
         name: user.name,
