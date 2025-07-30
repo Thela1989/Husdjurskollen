@@ -9,6 +9,7 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
 html,
 body {
   overscroll-behavior: none;
@@ -19,7 +20,7 @@ html {
   background-image: url("/testbilder/background.jpg");
   background-repeat: no-repeat;
   background-size: cover;
-  background-position: center top;
+  background-position: center;
   background-attachment: fixed;
   background-color: #000;
 }
@@ -36,6 +37,7 @@ body {
 .PetCare-List {
   list-style: none;
 }
+
 .hero-section {
   min-height: 100vh;
   display: flex;
@@ -43,6 +45,8 @@ body {
   align-items: flex-start;
   text-align: center;
   box-sizing: border-box;
+  flex-direction: column;
+  padding: 1rem;
 }
 
 .welcomeText {
@@ -74,7 +78,19 @@ body {
   box-sizing: border-box;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
+  html {
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-attachment: scroll;
+    background-color: black;
+  }
+
+  body {
+    width: 100vw;
+  }
+
   .account-container {
     padding: 1rem;
     margin: 1rem auto;
@@ -99,11 +115,19 @@ body {
     font-size: 1.2rem;
     margin-top: 40px;
   }
+
+  .hero-section {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 100vh;
+    padding: 1rem;
+  }
 }
 
 @media (min-width: 768px) {
   .account-container {
-    max-width: 400px;
+    max-width: 700px;
   }
 }
 
@@ -146,7 +170,6 @@ a:hover {
   align-items: center;
   text-align: center;
   justify-content: center;
-  margin-bottom: 100px;
 }
 
 .HomeContainer .button-row {
@@ -156,6 +179,7 @@ a:hover {
   margin-top: 1rem;
   flex-wrap: wrap;
 }
+
 .button-row button {
   border: solid white 1.5px;
 }

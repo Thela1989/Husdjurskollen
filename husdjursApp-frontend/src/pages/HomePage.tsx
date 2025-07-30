@@ -4,7 +4,7 @@ import { FaPaw } from "react-icons/fa";
 
 function HomePage() {
   const navigate = useNavigate();
-  // Navigerar till testkontot
+
   const handleLoginClick = () => {
     navigate("/account");
   };
@@ -21,6 +21,7 @@ function HomePage() {
         </h1>
 
         <p id="WelcomeP">Håll koll på ditt husdjurs vardag, behov och hälsa!</p>
+
         <div className="button-row">
           <button onClick={handleLoginClick}>Logga in</button>
           <button onClick={handleRegisterClick}>Registrera dig</button>
