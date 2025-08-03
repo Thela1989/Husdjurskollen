@@ -1,0 +1,69 @@
+@media (max-width: 768px) {
+  html {
+    background-size: contain;
+
+    background-position: center;
+    width: 100%;
+    height: 400px;
+
+    background-attachment: scroll;
+
+    background-image: url("/testbilder/mobile.bg.jpg");
+  }
+
+  .hero-content {
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    max-width: 60%;
+
+    padding: 2rem;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.4); /* mörk ton */
+    backdrop-filter: blur(10px); /* suddighet */
+    -webkit-backdrop-filter: blur(10px); /* för Safari-stöd */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+  form {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+  .register-form {
+    color: white;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000,
+      1px 1px 0 #000;
+  }
+
+  .PetName {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  body {
+    width: 100vw;
+  }
+
+  .account-container {
+    padding: 1rem;
+    margin: 1rem auto;
+    max-width: 95vw;
+  }
+
+  button {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+  }
+
+  .welcomeText {
+    font-size: 2rem;
+    margin: 0;
+
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000,
+      1px 1px 0 #000;
+  }
+}

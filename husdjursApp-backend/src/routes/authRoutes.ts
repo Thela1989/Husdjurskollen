@@ -7,11 +7,11 @@ const router = Router();
 
 // POST /api/auth/register
 const registerUser: RequestHandler = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { username, email, password } = req.body;
 
   // Kontrollera att alla fält finns
-  if (!name || !email || !password) {
-    res.status(400).json({ error: "Namn, e-post och lösenord krävs" });
+  if (!username || !email || !password) {
+    res.status(400).json({ error: "användarnamn, e-post och lösenord krävs" });
     return;
   }
 
@@ -31,8 +31,8 @@ const registerUser: RequestHandler = async (req, res) => {
 
     // Skapa användare
     const result = await pool.query(
-      "INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id, name, email",
-      [name, email, hashedPassword]
+      "INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING id, username, email",
+      [username, email, hashedPassword]
     );
 
     res.status(201).json({
@@ -49,7 +49,7 @@ router.post("/register", registerUser);
 
 //POST /api/auth/login
 const loginUser: RequestHandler = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { email, password } = req.body;
 
   if (!email || !password) {
     res.status(400).json({ error: "Epost och löseonod krävs" });
@@ -71,6 +71,14 @@ const loginUser: RequestHandler = async (req, res) => {
       res.status(401).json({ Error: "Ogiltige-post eller lösenord" });
       return;
     }
+    res.status(200).json({
+      message: "Inloggning lyckades",
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+      },
+    });
     //Skickar tillbaks användardata (ej lösenord)
   } catch (error) {
     console.error("Fel vid loggin:", error);

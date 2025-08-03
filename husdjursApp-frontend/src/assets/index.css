@@ -9,6 +9,11 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+.welcomeText {
+  font-size: clamp(2rem, 7vw, 4rem); /* minstorlek, skärm-baserad, maxstorlek */
+  margin-top: 40px;
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
+}
 
 html,
 body {
@@ -47,13 +52,6 @@ body {
   box-sizing: border-box;
   flex-direction: column;
   padding: 1rem;
-}
-
-.welcomeText {
-  color: #fff;
-  font-size: 70px;
-  margin-top: 70px;
-  text-shadow: 10px 2px 6px rgba(0, 0, 0, 0.6);
 }
 
 #WelcomeP {
@@ -120,10 +118,14 @@ body {
   }
 
   .welcomeText {
-    font-size: 2rem;
+    font-size: clamp(
+      2rem,
+      7vw,
+      4rem
+    ); /* minstorlek, skärm-baserad, maxstorlek */
     margin-top: 40px;
-    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000,
-      1px 1px 0 #000;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
+    color: white;
   }
 }
 

@@ -25,7 +25,14 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     );
 
     const newUser = result.rows[0];
-    res.status(201).json({ message: "Användare skapad", user: newUser });
+
+    const token = jwt.sign(
+      { userId: newUser.id },
+      process.env.JWT_SECRET as string,
+      { expiresIn: "2d" }
+    );
+
+    res.status(201).json({ message: "Användare skapad", token, user: newUser });
   } catch (error) {
     console.error("Fel vid registrering", error);
     res.status(500).json({ error: "Något gick fel vid registreringen" });
@@ -62,7 +69,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       },
       process.env.JWT_SECRET as string,
       {
-        expiresIn: "2h",
+        expiresIn: "2d",
       }
     );
 
