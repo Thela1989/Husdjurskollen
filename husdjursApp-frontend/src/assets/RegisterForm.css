@@ -18,13 +18,13 @@
     justify-content: center;
     flex-direction: column;
     max-width: 60%;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
 
     padding: 2rem;
     border-radius: 12px;
-    background: rgba(0, 0, 0, 0.4); /* mörk ton */
-    backdrop-filter: blur(10px); /* suddighet */
+    background: rgba(0, 0, 0, 0.329); /* mörk ton */
+    backdrop-filter: blur(4px); /* Prova 2px – 4px */
     -webkit-backdrop-filter: blur(10px); /* för Safari-stöd */
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   }
   form {
     display: flex;
@@ -55,8 +55,24 @@
   }
 
   button {
-    font-size: 0.9rem;
-    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    width: 200px;
+    border: 1px solid white;
+    padding: 0.6em 1.2em;
+    font-size: 0.8em;
+    font-weight: 500;
+    background-color: #1a1a1a;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out; /* 👈 viktig! */
+    margin: 5px;
+  }
+
+  button:hover {
+    transform: scale(1.05);
+    background-color: #333;
+    color: #fff;
+    border-color: #fff;
   }
 
   .welcomeText {
