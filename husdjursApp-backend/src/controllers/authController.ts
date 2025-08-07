@@ -21,7 +21,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const result = await pool.query(
       "INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id, name, email",
-      [name, email, hashedPassword]
+      [first_name, last_name, email, hashedPassword]
     );
 
     const newUser = result.rows[0];
@@ -41,7 +41,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
 // Inloggning
 export const login = async (req: Request, res: Response): Promise<void> => {
-  const { email, password } = req.body;
+  const { first_name, last_name, email, password } = req.body;
 
   try {
     const userResult = await pool.query(
@@ -80,7 +80,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       token,
       user: {
         id: user.id,
-        name: user.name,
+        first_name: user.first_name,
+        last_name: user.last_name,
         email: user.email,
       },
     });
