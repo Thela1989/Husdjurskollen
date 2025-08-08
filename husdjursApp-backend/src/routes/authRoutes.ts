@@ -1,3 +1,4 @@
+import jwt from "jsonwebtoken";
 import { Router, RequestHandler } from "express";
 import bcrypt from "bcryptjs";
 import pool from "../db";
@@ -7,10 +8,10 @@ const router = Router();
 
 // POST /api/auth/register
 const registerUser: RequestHandler = async (req, res) => {
-  const { username, email, password } = req.body;
+  const { first_name, last_name, email, password } = req.body;
 
   // Kontrollera att alla fält finns
-  if (!username || !email || !password) {
+  if (!first_name || !last_name || !email || !password) {
     res.status(400).json({ error: "användarnamn, e-post och lösenord krävs" });
     return;
   }
@@ -31,13 +32,21 @@ const registerUser: RequestHandler = async (req, res) => {
 
     // Skapa användare
     const result = await pool.query(
-      "INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING id, username, email",
-      [username, email, hashedPassword]
+      "INSERT INTO users (first_name, last_name, email, password) VALUES ($1, $2, $3, $4) RETURNING id, first_name, last_name, email",
+      [first_name, last_name, email, hashedPassword]
     );
 
-    res.status(201).json({
+    const newUser = result.rows[0];
+    const token = jwt.sign(
+      { userId: newUser.id },
+      process.env.JWT_SECRET as string,
+      { expiresIn: "2d" }
+    );
+
+    return res.status(201).json({
       message: "Användare skapad",
-      user: result.rows[0],
+      token,
+      user: newUser,
     });
   } catch (error) {
     console.error("Fel vid registrering:", error);
@@ -75,7 +84,8 @@ const loginUser: RequestHandler = async (req, res) => {
       message: "Inloggning lyckades",
       user: {
         id: user.id,
-        username: user.username,
+        first_name: user.firstname,
+        last_name: user.last_name,
         email: user.email,
       },
     });

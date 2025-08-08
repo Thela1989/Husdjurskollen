@@ -3,7 +3,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../assets/RegisterForm.css";
 function RegisterForm() {
-  const [username, setUsername] = useState("");
+  const [first_name, setFirstname] = useState("");
+  const [last_name, setLastname] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -13,11 +14,14 @@ function RegisterForm() {
     e.preventDefault();
 
     try {
-      const res = await axios.post("http://localhost:5000/api/register", {
-        username,
+      const res = await axios.post("http://localhost:5000/api/auth/register", {
+        first_name,
+        last_name,
         email,
         password,
       });
+
+      console.log("Server response:", res.data);
 
       //Spara JWT token om den som skickar tillbaks
       const token = res.data.token;
@@ -41,9 +45,16 @@ function RegisterForm() {
       <h2>Registrera dig</h2>
       <input
         type="text"
-        placeholder="Användarnamn"
-        value={username}
-        onChange={e => setUsername(e.target.value)}
+        placeholder="Förnamn"
+        value={first_name}
+        onChange={e => setFirstname(e.target.value)}
+        required
+      ></input>
+      <input
+        type="text"
+        placeholder="Efternamn"
+        value={last_name}
+        onChange={e => setLastname(e.target.value)}
         required
       ></input>
 
