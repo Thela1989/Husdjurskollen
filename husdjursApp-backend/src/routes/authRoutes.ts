@@ -3,11 +3,14 @@ import { Router, RequestHandler } from "express";
 import bcrypt from "bcryptjs";
 import pool from "../db";
 import { Result } from "pg";
-
+import { Request, Response } from "express";
 const router = Router();
 
 // POST /api/auth/register
-const registerUser: RequestHandler = async (req, res) => {
+const registerUser: RequestHandler = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const { first_name, last_name, email, password } = req.body;
 
   // Kontrollera att alla fält finns
@@ -43,7 +46,7 @@ const registerUser: RequestHandler = async (req, res) => {
       { expiresIn: "2d" }
     );
 
-    return res.status(201).json({
+    res.status(201).json({
       message: "Användare skapad",
       token,
       user: newUser,
