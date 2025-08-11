@@ -6,6 +6,9 @@ import { Link } from "react-router-dom";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
 
+const token = localStorage.getItem("token");
+const authHeader = token ? { Authorization: `Bearer ${token}` } : {};
+
 // Typdefinitioner
 interface User {
   id: number;
@@ -41,7 +44,9 @@ function Account() {
   // Ta bort husdjur
   const handleDelete = async (id: number) => {
     try {
-      await axios.delete(`http://localhost:5000/pets/${id}`);
+      await axios.delete(`http://localhost:5000/api/pets/${id}`, {
+        headers: authHeader,
+      });
       setPets(prev => prev.filter(p => p.id !== id));
     } catch (error) {
       console.error("Kunde inte ta bort husdjuret:", error);
@@ -50,20 +55,45 @@ function Account() {
 
   // Hämta husdjur
   const refreshingPets = () => {
-    axios.get("http://localhost:5000/pets").then(res => {
-      const userPets = res.data.filter((pet: Pet) => pet.owner_id === user?.id);
-      setPets(userPets);
-    });
+    if (!token || !user?.id) return; // vänta tills user finns
+    axios
+      .get("http://localhost:5000/api/pets", { headers: authHeader })
+      .then(res => {
+        const userPets = res.data.filter(
+          (pet: Pet) => pet.owner_id === user.id
+        );
+        setPets(userPets);
+      })
+      .catch(err => console.error("Kunde inte hämta husdjur:", err));
   };
 
-  // Hämta användare
+  // När user är satt, hämta husdjur
   useEffect(() => {
-    axios.get("http://localhost:5000/users").then(res => {
-      const found = res.data.find((u: User) => u.id === 2); // <-- justera om du har inloggning
-      setUser(found);
-    });
-    refreshingPets();
+    if (!token) {
+      console.error("Ingen token hittad – användaren är inte inloggad.");
+      return;
+    }
+
+    // 1) Hämta inloggad användare via /api/users/me
+    axios
+      .get("http://localhost:5000/api/users/me", { headers: authHeader })
+      .then(res => {
+        // backend skickar { id, first_name, last_name, email }
+        setUser({
+          id: res.data.id,
+          name: `${res.data.first_name} ${res.data.last_name}`,
+          email: res.data.email,
+          style: "",
+        });
+      })
+      .catch(err => console.error("Kunde inte hämta användare:", err));
   }, []);
+
+  // När user är satt, hämta husdjur
+  useEffect(() => {
+    refreshingPets();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   return (
     <div className="page-wrapper p-6">
@@ -83,10 +113,18 @@ function Account() {
                 email={user.email}
                 onEditDone={() => {
                   setEditUserMode(false);
-                  axios.get("http://localhost:5000/users").then(res => {
-                    const found = res.data.find((u: User) => u.id === 2);
-                    setUser(found);
-                  });
+                  axios
+                    .get("http://localhost:5000/api/users/me", {
+                      headers: authHeader,
+                    })
+                    .then(res => {
+                      setUser({
+                        id: res.data.id,
+                        name: `${res.data.first_name} ${res.data.last_name}`,
+                        email: res.data.email,
+                        style: "",
+                      });
+                    });
                 }}
               />
             ) : (
