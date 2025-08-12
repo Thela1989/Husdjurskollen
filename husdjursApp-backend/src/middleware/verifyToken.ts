@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { RequestHandler } from "express";
 import jwt from "jsonwebtoken";
 
@@ -33,3 +34,5 @@ const verifyToken: RequestHandler = (req, res, next) => {
 };
 
 export default verifyToken;
+=======
+>>>>>>> parent of 8669658 (startat med login formuläret)

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -66,3 +67,6 @@ function Loginform() {
 }
 
 export default Loginform;
+=======
+//Inte börjat än!!! Denan ska styra funktion för inloggning
+>>>>>>> parent of 8669658 (startat med login formuläret)

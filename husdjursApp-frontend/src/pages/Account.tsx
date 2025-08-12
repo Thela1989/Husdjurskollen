@@ -5,7 +5,10 @@ import PetForm from "../components/PetForm";
 import UserForm from "../components/UserForm";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
+<<<<<<< HEAD
 import api from "../lib/api";
+=======
+>>>>>>> parent of 8669658 (startat med login formuläret)
 
 // Typdefinitioner
 interface User {
@@ -35,6 +38,7 @@ function Account() {
   const [loadingUser, setLoadingUser] = useState(true);
   const [errUser, setErrUser] = useState<string>("");
 
+<<<<<<< HEAD
   // Hjälpare: mappa olika svarformat till vår User
   const mapToUser = useCallback((data: any): User | null => {
     if (!data) return null;
@@ -128,6 +132,40 @@ function Account() {
       console.error("Kunde inte hämta husdjur:", e);
     }
   }, [user?.id]);
+=======
+  // Lägg till nytt husdjur
+  const handlePetCreated = (newPet: Pet) => {
+    setPets(prev => [...prev, newPet]);
+    setShowForm(false);
+  };
+
+  // Ta bort husdjur
+  const handleDelete = async (id: number) => {
+    try {
+      await axios.delete(`http://localhost:5000/pets/${id}`);
+      setPets(prev => prev.filter(p => p.id !== id));
+    } catch (error) {
+      console.error("Kunde inte ta bort husdjuret:", error);
+    }
+  };
+
+  // Hämta husdjur
+  const refreshingPets = () => {
+    axios.get("http://localhost:5000/pets").then(res => {
+      const userPets = res.data.filter((pet: Pet) => pet.owner_id === user?.id);
+      setPets(userPets);
+    });
+  };
+
+  // Hämta användare
+  useEffect(() => {
+    axios.get("http://localhost:5000/users").then(res => {
+      const found = res.data.find((u: User) => u.id === 2); // <-- justera om du har inloggning
+      setUser(found);
+    });
+    refreshingPets();
+  }, []);
+>>>>>>> parent of 8669658 (startat med login formuläret)
 
   // Ta bort husdjur
   const handleDelete = useCallback(async (id: number) => {
@@ -172,7 +210,14 @@ function Account() {
                 email={user.email}
                 onEditDone={async () => {
                   setEditUserMode(false);
+<<<<<<< HEAD
                   await loadUser(); // uppdatera visningen efter PUT
+=======
+                  axios.get("http://localhost:5000/users").then(res => {
+                    const found = res.data.find((u: User) => u.id === 2);
+                    setUser(found);
+                  });
+>>>>>>> parent of 8669658 (startat med login formuläret)
                 }}
               />
             ) : (
