@@ -1,83 +1,107 @@
+// src/components/RegisterForm.tsx
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "../assets/RegisterForm.css";
+
 function RegisterForm() {
-  const [first_name, setFirstname] = useState("");
-  const [last_name, setLastname] = useState("");
+  const navigate = useNavigate();
+  const [first_name, setFirstName] = useState("");
+  const [last_name, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
-  const navigate = useNavigate();
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const API_BASE = import.meta.env.VITE_API_URL ?? ""; // om du använder proxy, kan vara tom
+
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+    setLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/register", {
+      const res = await axios.post(`${API_BASE}/api/auth/register`, {
         first_name,
         last_name,
         email,
         password,
       });
 
-      console.log("Server response:", res.data);
+      // ✅ Spara token direkt
+      localStorage.setItem("token", res.data.token);
 
-      //Spara JWT token om den som skickar tillbaks
-      const token = res.data.token;
-      if (token) {
-        localStorage.setItem("token", token);
-        setMessage("Registrering lyckades! Du är nu inloggad");
-        navigate("/account");
-      } else {
-        setMessage("Registreringen lyckades, men ingen token mottagen");
-      }
-    } catch (error: any) {
-      console.error(error);
-      setMessage(
-        error?.response?.data?.error || "Kunde inte registrera användare."
-      );
+      // ✅ Navigera till kontosidan
+      navigate("/account");
+    } catch (err: any) {
+      const msg =
+        err?.response?.data?.error || "Något gick fel vid registreringen.";
+      setError(msg);
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="register-form">
-      <h2>Registrera dig</h2>
-      <input
-        type="text"
-        placeholder="Förnamn"
-        value={first_name}
-        onChange={e => setFirstname(e.target.value)}
-        required
-      ></input>
-      <input
-        type="text"
-        placeholder="Efternamn"
-        value={last_name}
-        onChange={e => setLastname(e.target.value)}
-        required
-      ></input>
+    <div className="RegisterForm">
+      <h2 className="text-xl font-semibold text-center mb-4">Registrera dig</h2>
 
-      <input
-        type="email"
-        placeholder="E-post"
-        value={email}
-        onChange={e => setEmail(e.target.value)}
-        required
-      ></input>
+      {error && <p className="text-red-600 text-sm mb-3">{error}</p>}
 
-      <input
-        type="password"
-        placeholder="Lösenord"
-        value={password}
-        onChange={e => setPassword(e.target.value)}
-        required
-      ></input>
+      <form onSubmit={handleRegister} className="space-y-4">
+        <div>
+          <label className="block text-sm mb-1">Förnamn</label>
+          <input
+            type="text"
+            value={first_name}
+            onChange={e => setFirstName(e.target.value)}
+            className="w-full border rounded px-3 py-2"
+            required
+          />
+        </div>
 
-      <button type="submit">Skicka</button>
+        <div>
+          <label className="block text-sm mb-1">Efternamn</label>
+          <input
+            type="text"
+            value={last_name}
+            onChange={e => setLastName(e.target.value)}
+            className="w-full border rounded px-3 py-2"
+            required
+          />
+        </div>
 
-      {message && <p className="form-message">{message}</p>}
-    </form>
+        <div>
+          <label className="block text-sm mb-1">E-post</label>
+          <input
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            className="w-full border rounded px-3 py-2"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm mb-1">Lösenord</label>
+          <input
+            type="password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            className="w-full border rounded px-3 py-2"
+            required
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-black text-white py-2 rounded disabled:opacity-60"
+        >
+          {loading ? "Registrerar…" : "Registrera dig"}
+        </button>
+      </form>
+    </div>
   );
 }
 

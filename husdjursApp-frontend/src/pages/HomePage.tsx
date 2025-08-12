@@ -1,19 +1,21 @@
 // src/pages/HomePage.tsx
-import { useNavigate } from "react-router-dom";
 import { FaPaw } from "react-icons/fa";
-import RegisterForm from "../components/RegisterForm";
 import { useState } from "react";
+import RegisterForm from "../components/RegisterForm";
+import LoginForm from "../components/LoginForm";
 
 function HomePage() {
-  const navigate = useNavigate();
   const [showRegister, setShowRegister] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
 
   const handleLoginClick = () => {
-    navigate("/account");
+    setShowLogin(true); // visa loginformulär
+    setShowRegister(false); // göm registerformulär om det var öppet
   };
 
   const handleRegisterClick = () => {
-    setShowRegister(true); //visa formulär
+    setShowRegister(true);
+    setShowLogin(false);
   };
 
   return (
@@ -25,14 +27,15 @@ function HomePage() {
 
         <p id="WelcomeP">Håll koll på ditt husdjurs vardag, behov och hälsa!</p>
 
-        {!showRegister ? (
+        {!showRegister && !showLogin && (
           <div className="button-row">
             <button onClick={handleLoginClick}>Logga in</button>
             <button onClick={handleRegisterClick}>Registrera dig</button>
           </div>
-        ) : (
-          <RegisterForm />
         )}
+
+        {showLogin && <LoginForm />}
+        {showRegister && <RegisterForm />}
       </div>
     </div>
   );
