@@ -1,20 +1,18 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+// src/pages/Account.tsx
+import { useEffect, useState, useCallback } from "react";
+import { Link } from "react-router-dom";
 import PetForm from "../components/PetForm";
 import UserForm from "../components/UserForm";
-import { Link } from "react-router-dom";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
-
-const token = localStorage.getItem("token");
-const authHeader = token ? { Authorization: `Bearer ${token}` } : {};
+import api from "../lib/api";
 
 // Typdefinitioner
 interface User {
   id: number;
   name: string;
   email: string;
-  style: string;
+  style?: string;
 }
 
 interface Pet {
@@ -34,66 +32,122 @@ function Account() {
   const [showForm, setShowForm] = useState(false);
   const [editingPet, setEditingPet] = useState<Pet | null>(null);
   const [editUserMode, setEditUserMode] = useState(false);
+  const [loadingUser, setLoadingUser] = useState(true);
+  const [errUser, setErrUser] = useState<string>("");
 
-  // Lägg till nytt husdjur
-  const handlePetCreated = (newPet: Pet) => {
-    setPets(prev => [...prev, newPet]);
-    setShowForm(false);
-  };
-
-  // Ta bort husdjur
-  const handleDelete = async (id: number) => {
-    try {
-      await axios.delete(`http://localhost:5000/api/pets/${id}`, {
-        headers: authHeader,
-      });
-      setPets(prev => prev.filter(p => p.id !== id));
-    } catch (error) {
-      console.error("Kunde inte ta bort husdjuret:", error);
+  // Hjälpare: mappa olika svarformat till vår User
+  const mapToUser = useCallback((data: any): User | null => {
+    if (!data) return null;
+    // Vanligt: { user: { id, name, email } }
+    if (data.user?.id) {
+      return {
+        id: data.user.id,
+        name:
+          data.user.name ??
+          `${data.user.first_name ?? ""} ${data.user.last_name ?? ""}`.trim(),
+        email: data.user.email,
+      };
     }
-  };
-
-  // Hämta husdjur
-  const refreshingPets = () => {
-    if (!token || !user?.id) return; // vänta tills user finns
-    axios
-      .get("http://localhost:5000/api/pets", { headers: authHeader })
-      .then(res => {
-        const userPets = res.data.filter(
-          (pet: Pet) => pet.owner_id === user.id
-        );
-        setPets(userPets);
-      })
-      .catch(err => console.error("Kunde inte hämta husdjur:", err));
-  };
-
-  // När user är satt, hämta husdjur
-  useEffect(() => {
-    if (!token) {
-      console.error("Ingen token hittad – användaren är inte inloggad.");
-      return;
+    // Alternativt: { id, first_name, last_name, email }
+    if (data.id && (data.name || data.first_name)) {
+      return {
+        id: data.id,
+        name:
+          data.name ??
+          `${data.first_name ?? ""} ${data.last_name ?? ""}`.trim(),
+        email: data.email,
+      };
     }
-
-    // 1) Hämta inloggad användare via /api/users/me
-    axios
-      .get("http://localhost:5000/api/users/me", { headers: authHeader })
-      .then(res => {
-        // backend skickar { id, first_name, last_name, email }
-        setUser({
-          id: res.data.id,
-          name: `${res.data.first_name} ${res.data.last_name}`,
-          email: res.data.email,
-          style: "",
-        });
-      })
-      .catch(err => console.error("Kunde inte hämta användare:", err));
+    return null;
   }, []);
 
-  // När user är satt, hämta husdjur
-  useEffect(() => {
-    refreshingPets();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  // Ladda inloggad användare
+  const loadUser = useCallback(async () => {
+    setLoadingUser(true);
+    setErrUser("");
+    try {
+      // 1) Primärt: /auth/me (kräver att backend har denna)
+      const res = await api.get("/api/auth/me");
+      const u = mapToUser(res.data);
+      if (u) {
+        setUser(u);
+        return;
+      }
+      throw new Error("auth/me gav inget användarobjekt");
+    } catch (e1: any) {
+      console.warn(
+        "GET /api/auth/me misslyckades:",
+        e1?.response?.status,
+        e1?.message
+      );
+
+      // 2) Fallback: använd userId från localStorage och hämta /api/users/:id
+      const id = localStorage.getItem("userId");
+      if (!id) {
+        setUser(null);
+        setErrUser("Ingen token eller userId — logga in igen.");
+        setLoadingUser(false);
+        return;
+      }
+      try {
+        const res2 = await api.get(`/api/users/${id}`);
+        const u2 = mapToUser(res2.data) ?? res2.data; // stöd både {user} och direkt fält
+        if (!u2?.id) throw new Error("users/:id gav inget användarobjekt");
+        setUser({
+          id: u2.id,
+          name:
+            u2.name ?? `${u2.first_name ?? ""} ${u2.last_name ?? ""}`.trim(),
+          email: u2.email,
+        });
+      } catch (e2: any) {
+        console.error(
+          "Fallback /api/users/:id misslyckades:",
+          e2?.response?.status,
+          e2?.message
+        );
+        setUser(null);
+        setErrUser(e2?.response?.data?.error || "Kunde inte hämta användare.");
+      } finally {
+        setLoadingUser(false);
+      }
+      return;
+    } finally {
+      // Om första try:et lyckades går vi inte hit förrän efter setUser; bra att ha ändå
+      setLoadingUser(false);
+    }
+  }, [mapToUser]);
+
+  // Hämta husdjur (behöver user.id)
+  const loadPets = useCallback(async () => {
+    if (!user?.id) return;
+    try {
+      const res = await api.get("/api/pets");
+      const userPets = (res.data as Pet[]).filter(p => p.owner_id === user.id);
+      setPets(userPets);
+    } catch (e) {
+      console.error("Kunde inte hämta husdjur:", e);
+    }
   }, [user?.id]);
+
+  // Ta bort husdjur
+  const handleDelete = useCallback(async (id: number) => {
+    try {
+      await api.delete(`/api/pets/${id}`);
+      setPets(prev => prev.filter(p => p.id !== id));
+    } catch (e) {
+      console.error("Kunde inte ta bort husdjuret:", e);
+    }
+  }, []);
+
+  // När sidan mountar → hämta user
+  useEffect(() => {
+    loadUser();
+  }, [loadUser]);
+
+  // När user finns → hämta husdjur
+  useEffect(() => {
+    loadPets();
+  }, [loadPets]);
 
   return (
     <div className="page-wrapper p-6">
@@ -103,28 +157,22 @@ function Account() {
         </Link>
         <h1 className="text-2xl font-bold mb-4">Ditt konto</h1>
 
-        {!user ? (
+        {loadingUser ? (
           <p>Laddar användare...</p>
+        ) : errUser ? (
+          <p className="text-red-600">{errUser}</p>
+        ) : !user ? (
+          <p>Ingen användare hittades. Prova logga in igen.</p>
         ) : (
           <>
             {editUserMode ? (
               <UserForm
+                userId={user.id}
                 name={user.name}
                 email={user.email}
-                onEditDone={() => {
+                onEditDone={async () => {
                   setEditUserMode(false);
-                  axios
-                    .get("http://localhost:5000/api/users/me", {
-                      headers: authHeader,
-                    })
-                    .then(res => {
-                      setUser({
-                        id: res.data.id,
-                        name: `${res.data.first_name} ${res.data.last_name}`,
-                        email: res.data.email,
-                        style: "",
-                      });
-                    });
+                  await loadUser(); // uppdatera visningen efter PUT
                 }}
               />
             ) : (
@@ -143,7 +191,13 @@ function Account() {
             )}
 
             {showForm && !editingPet && (
-              <PetForm onPetCreated={handlePetCreated} ownerId={user.id} />
+              <PetForm
+                onPetCreated={newPet => {
+                  setPets(prev => [...prev, newPet]);
+                  setShowForm(false);
+                }}
+                ownerId={user.id}
+              />
             )}
 
             <h3 className="text-lg font-semibold mt-6 mb-2">Dina husdjur</h3>
@@ -161,9 +215,12 @@ function Account() {
                         ownerId={user.id}
                         onEditDone={() => {
                           setEditingPet(null);
-                          refreshingPets();
+                          loadPets();
                         }}
-                        onPetCreated={handlePetCreated}
+                        onPetCreated={p => {
+                          setPets(prev => [...prev, p]);
+                          setEditingPet(null);
+                        }}
                       />
                     ) : (
                       <>
@@ -202,7 +259,6 @@ function Account() {
                             Ta bort <FaTrash className="inline ml-1" />
                           </button>
 
-                          {/* 🔗 Knapp till hälsoöversikt */}
                           <Link to={`/pet/${pet.id}/health`}>
                             <button className="bg-black text-white px-3 py-1 rounded-full w-full">
                               {pet.name} – Hälsa

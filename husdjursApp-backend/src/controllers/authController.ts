@@ -3,101 +3,167 @@ import pool from "../db";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-// ✅ Registrering
+// Hjälpare: signera JWT
+function signToken(userId: number) {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error("JWT_SECRET saknas i miljövariablerna");
+  }
+  return jwt.sign({ userId }, secret, { expiresIn: "2d" });
+}
+
+// Hjälpare: mappa DB-rad till user-objekt
+function mapUser(row: any) {
+  return {
+    id: row.id,
+    first_name: row.first_name,
+    last_name: row.last_name,
+    email: row.email,
+  };
+}
+
+// =========================
+// POST /api/auth/register
+// =========================
 export const register = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const { first_name, last_name, email, password } = req.body;
-
-  if (!email || !password || !first_name || !last_name) {
-    return res.status(400).json({ message: "Alla fält krävs" });
-  }
-
   try {
-    // Kolla om e-post redan finns
-    const userCheck = await pool.query("SELECT * FROM users WHERE email = $1", [
-      email,
-    ]);
-    if (userCheck.rows.length > 0) {
+    let { first_name, last_name, email, password } = req.body ?? {};
+
+    // Trim & basvalidering
+    first_name = (first_name ?? "").toString().trim();
+    last_name = (last_name ?? "").toString().trim();
+    email = (email ?? "").toString().trim().toLowerCase();
+    password = (password ?? "").toString();
+
+    if (!first_name || !last_name || !email || !password) {
+      return res.status(400).json({ ok: false, error: "Alla fält krävs" });
+    }
+    if (password.length < 6) {
       return res
         .status(400)
-        .json({ error: "E-postadressen är redan registrerad" });
+        .json({ ok: false, error: "Lösenordet måste vara minst 6 tecken" });
     }
 
-    // Kryptera lösenord
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Finns redan?
+    const exists = await pool.query("SELECT 1 FROM users WHERE email = $1", [
+      email,
+    ]);
+    if (exists.rowCount && exists.rowCount > 0) {
+      return res
+        .status(400)
+        .json({ ok: false, error: "E-postadressen är redan registrerad" });
+    }
 
-    // Spara användare i databasen
+    // Hash & spara
+    const hash = await bcrypt.hash(password, 10);
     const result = await pool.query(
       `INSERT INTO users (first_name, last_name, email, password)
        VALUES ($1, $2, $3, $4)
        RETURNING id, first_name, last_name, email`,
-      [first_name, last_name, email, hashedPassword]
+      [first_name, last_name, email, hash]
     );
 
-    const newUser = result.rows[0];
-
-    // Skapa JWT-token
-    const token = jwt.sign(
-      { userId: newUser.id },
-      process.env.JWT_SECRET as string,
-      { expiresIn: "2d" }
-    );
+    const user = mapUser(result.rows[0]);
+    const token = signToken(user.id);
 
     return res.status(201).json({
+      ok: true,
       message: "Användare skapad",
       token,
-      user: newUser,
+      user,
     });
-  } catch (error) {
-    console.error("Fel vid registrering:", error);
-    return res.status(500).json({ error: "Något gick fel vid registreringen" });
+  } catch (err: any) {
+    // Hantera unikhetsfel om det finns unik index på email
+    // (Postgres error code 23505)
+    if (err?.code === "23505") {
+      return res
+        .status(400)
+        .json({ ok: false, error: "E-postadressen är redan registrerad" });
+    }
+    console.error("Fel vid registrering:", err);
+    return res
+      .status(500)
+      .json({ ok: false, error: "Något gick fel vid registreringen" });
   }
 };
 
-// ✅ Inloggning
+// ======================
+// POST /api/auth/login
+// ======================
 export const login = async (req: Request, res: Response): Promise<Response> => {
-  const { email, password } = req.body;
-
   try {
-    // Hämta användare via e-post
+    let { email, password } = req.body ?? {};
+    email = (email ?? "").toString().trim().toLowerCase();
+    password = (password ?? "").toString();
+
+    if (!email || !password) {
+      return res
+        .status(400)
+        .json({ ok: false, error: "E-post och lösenord krävs" });
+    }
+
     const userResult = await pool.query(
       "SELECT * FROM users WHERE email = $1",
       [email]
     );
-
-    if (userResult.rows.length === 0) {
-      return res.status(400).json({ error: "Fel e-post eller lösenord" });
+    if (userResult.rowCount === 0) {
+      return res
+        .status(400)
+        .json({ ok: false, error: "Fel e‑post eller lösenord" });
     }
 
-    const user = userResult.rows[0];
-
-    // Jämför lösenord
-    const isPasswordCorrect = await bcrypt.compare(password, user.password);
-    if (!isPasswordCorrect) {
-      return res.status(400).json({ error: "Fel e-post eller lösenord" });
+    const row = userResult.rows[0];
+    const match = await bcrypt.compare(password, row.password);
+    if (!match) {
+      return res
+        .status(400)
+        .json({ ok: false, error: "Fel e‑post eller lösenord" });
     }
 
-    // Skapa JWT-token
-    const token = jwt.sign(
-      { userId: user.id },
-      process.env.JWT_SECRET as string,
-      { expiresIn: "2d" }
-    );
+    const user = mapUser(row);
+    const token = signToken(user.id);
 
     return res.status(200).json({
+      ok: true,
       message: "Inloggningen lyckades",
       token,
-      user: {
-        id: user.id,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        email: user.email,
-      },
+      user,
     });
-  } catch (error) {
-    console.error("Fel vid inloggning:", error);
-    return res.status(500).json({ error: "Något gick fel vid inloggning" });
+  } catch (err) {
+    console.error("Fel vid inloggning:", err);
+    return res
+      .status(500)
+      .json({ ok: false, error: "Något gick fel vid inloggning" });
+  }
+};
+
+// ===================================
+// GET /api/auth/me  (skyddad route)
+// kräver verifyToken som sätter req.userId
+// ===================================
+export const me = async (
+  req: Request & { userId?: number },
+  res: Response
+): Promise<Response> => {
+  try {
+    if (!req.userId) {
+      return res
+        .status(401)
+        .json({ ok: false, error: "Ingen token eller ogiltig token" });
+    }
+    const result = await pool.query(
+      "SELECT id, first_name, last_name, email FROM users WHERE id = $1",
+      [req.userId]
+    );
+    if (result.rowCount === 0) {
+      return res.status(404).json({ ok: false, error: "User not found" });
+    }
+    return res.status(200).json({ ok: true, user: mapUser(result.rows[0]) });
+  } catch (err) {
+    console.error("Fel vid /auth/me:", err);
+    return res.status(500).json({ ok: false, error: "Något gick fel" });
   }
 };

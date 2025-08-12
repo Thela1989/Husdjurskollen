@@ -1,7 +1,7 @@
 // src/components/RegisterForm.tsx
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import api from "../lib/api";
 
 function RegisterForm() {
   const navigate = useNavigate();
@@ -12,29 +12,39 @@ function RegisterForm() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const API_BASE = import.meta.env.VITE_API_URL ?? ""; // om du använder proxy, kan vara tom
-
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
-      const res = await axios.post(`${API_BASE}/api/auth/register`, {
-        first_name,
-        last_name,
+      const name = `${first_name} ${last_name}`.trim();
+
+      // Antaget att backend returnerar { token, user: { id, name, email } }
+      const res = await api.post("/api/auth/register", {
+        name,
         email,
         password,
       });
+      const { token, user } = res.data || {};
 
-      // ✅ Spara token direkt
-      localStorage.setItem("token", res.data.token);
+      if (!user?.id) {
+        throw new Error("Kunde inte läsa ut user.id från svaret.");
+      }
 
-      // ✅ Navigera till kontosidan
+      // 🔹 Spara token och id så att /account kan ladda /auth/me
+      if (token) {
+        localStorage.setItem("token", token);
+      }
+      localStorage.setItem("userId", String(user.id));
+
+      // Skicka användaren till konto-sidan direkt
       navigate("/account");
     } catch (err: any) {
       const msg =
-        err?.response?.data?.error || "Något gick fel vid registreringen.";
+        err?.response?.data?.error ||
+        err?.message ||
+        "Något gick fel vid registreringen.";
       setError(msg);
       console.error(err);
     } finally {
@@ -44,61 +54,38 @@ function RegisterForm() {
 
   return (
     <div className="RegisterForm">
-      <h2 className="text-xl font-semibold text-center mb-4">Registrera dig</h2>
-
-      {error && <p className="text-red-600 text-sm mb-3">{error}</p>}
-
+      {error && <p className="text-red-600">{error}</p>}
       <form onSubmit={handleRegister} className="space-y-4">
-        <div>
-          <label className="block text-sm mb-1">Förnamn</label>
-          <input
-            type="text"
-            value={first_name}
-            onChange={e => setFirstName(e.target.value)}
-            className="w-full border rounded px-3 py-2"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm mb-1">Efternamn</label>
-          <input
-            type="text"
-            value={last_name}
-            onChange={e => setLastName(e.target.value)}
-            className="w-full border rounded px-3 py-2"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm mb-1">E-post</label>
-          <input
-            type="email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            className="w-full border rounded px-3 py-2"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm mb-1">Lösenord</label>
-          <input
-            type="password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            className="w-full border rounded px-3 py-2"
-            required
-          />
-        </div>
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-black text-white py-2 rounded disabled:opacity-60"
-        >
-          {loading ? "Registrerar…" : "Registrera dig"}
+        <input
+          type="text"
+          placeholder="Förnamn"
+          value={first_name}
+          onChange={e => setFirstName(e.target.value)}
+          required
+        />
+        <input
+          type="text"
+          placeholder="Efternamn"
+          value={last_name}
+          onChange={e => setLastName(e.target.value)}
+          required
+        />
+        <input
+          type="email"
+          placeholder="E-post"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Lösenord"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          required
+        />
+        <button type="submit" disabled={loading}>
+          {loading ? "Registrerar..." : "Registrera"}
         </button>
       </form>
     </div>
