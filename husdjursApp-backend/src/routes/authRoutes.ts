@@ -1,30 +1,10 @@
-// src/routes/authRoutes.ts
-import {
-  Router,
-  Request,
-  Response,
-  NextFunction,
-  RequestHandler,
-} from "express";
+import { Router, RequestHandler } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import pool from "../db";
 import verifyToken from "../middleware/verifyToken";
 
 const router = Router();
-
-/**
- * Augmentera Express.Request så vi kan använda req.userId.
- * (Flytta gärna till t.ex. src/types/express.d.ts senare.)
- */
-declare global {
-  namespace Express {
-    // userId sätts i verifyToken
-    interface Request {
-      userId?: number;
-    }
-  }
-}
 
 function signToken(userId: number) {
   const secret = process.env.JWT_SECRET;
@@ -35,7 +15,6 @@ function signToken(userId: number) {
 /** POST /api/auth/register */
 const registerUser: RequestHandler = async (req, res) => {
   const { first_name, last_name, email, password } = req.body ?? {};
-
   if (!first_name || !last_name || !email || !password) {
     res
       .status(400)
@@ -67,7 +46,6 @@ const registerUser: RequestHandler = async (req, res) => {
 
     const user = result.rows[0];
     const token = signToken(user.id);
-
     res.status(201).json({ message: "Användare skapad", token, user });
   } catch (error: any) {
     if (error?.code === "23505") {
@@ -84,7 +62,6 @@ router.post("/register", registerUser);
 /** POST /api/auth/login */
 const loginUser: RequestHandler = async (req, res) => {
   const { email, password } = req.body ?? {};
-
   if (!email || !password) {
     res.status(400).json({ error: "E‑post och lösenord krävs" });
     return;
@@ -99,23 +76,22 @@ const loginUser: RequestHandler = async (req, res) => {
       return;
     }
 
-    const row = result.rows[0];
-    const ok = await bcrypt.compare(String(password), row.password);
+    const u = result.rows[0];
+    const ok = await bcrypt.compare(String(password), u.password);
     if (!ok) {
       res.status(400).json({ error: "Fel e‑post eller lösenord" });
       return;
     }
 
-    const token = signToken(row.id);
-
+    const token = signToken(u.id);
     res.status(200).json({
       message: "Inloggning lyckades",
       token,
       user: {
-        id: row.id,
-        first_name: row.first_name,
-        last_name: row.last_name,
-        email: row.email,
+        id: u.id,
+        first_name: u.first_name,
+        last_name: u.last_name,
+        email: u.email,
       },
     });
   } catch (error) {
@@ -136,12 +112,10 @@ const meHandler: RequestHandler = async (req, res) => {
       "SELECT id, first_name, last_name, email FROM users WHERE id = $1",
       [req.userId]
     );
-
     if (!rowCount) {
       res.status(404).json({ error: "Användare hittades inte" });
       return;
     }
-
     res.json({ user: rows[0] });
   } catch (e) {
     console.error("Fel vid /auth/me:", e);
@@ -149,6 +123,7 @@ const meHandler: RequestHandler = async (req, res) => {
   }
 };
 
-router.get("/me", verifyToken as RequestHandler, meHandler);
+router.post("/login", loginUser);
+router.get("/me", verifyToken, meHandler);
 
 export default router;

@@ -1,6 +1,13 @@
-// src/middleware/verifyToken.ts
 import { RequestHandler } from "express";
 import jwt from "jsonwebtoken";
+
+declare global {
+  namespace Express {
+    interface Request {
+      userId?: number;
+    }
+  }
+}
 
 const verifyToken: RequestHandler = (req, res, next) => {
   const header = req.headers.authorization;
@@ -21,7 +28,7 @@ const verifyToken: RequestHandler = (req, res, next) => {
     req.userId = decoded.userId;
     next();
   } catch {
-    res.status(401).json({ error: "Ogiltig token" });
+    res.status(401).json({ error: "Ogiltig eller utgången token" });
   }
 };
 

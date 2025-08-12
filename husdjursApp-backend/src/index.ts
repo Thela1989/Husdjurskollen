@@ -1,27 +1,17 @@
-import dotenv from "dotenv";
-dotenv.config();
-import cors from "cors";
 import express from "express";
+import cors from "cors";
 import authRoutes from "./routes/authRoutes";
-import userRoutes from "./routes/userRoutes";
-import petRoutes from "./routes/petRoutes";
-import healthRoutes from "./routes/healthRoutes";
-import careRoutes from "./routes/careRoutes";
+// import övriga routes vid behov
 
 const app = express();
-const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 app.use(express.json());
 
-// Använd routes
-app.use("/api/auth", authRoutes);
-app.use("/api/users", userRoutes);
-app.use("/api/pets", petRoutes);
-app.use("/api/health", healthRoutes);
-app.use("/api/care", careRoutes);
+app.get("/", (_req, res) => res.send("API OK"));
 
-// Starta servern
-app.listen(PORT, () => {
-  console.log(`Servern kör på http://localhost:${PORT}`);
-});
+app.use("/api/auth", authRoutes);
+// app.use("/api/users", userRoutes) osv
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server kör på http://localhost:${PORT}`));
