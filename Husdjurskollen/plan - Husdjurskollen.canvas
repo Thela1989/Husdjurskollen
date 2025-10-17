@@ -1,0 +1,16 @@
+{
+	"nodes":[
+		{"id":"7fb9a8f05d5ce926","type":"text","text":"\n\n🔐 JWT-inloggning  \n- [x] Skapa & signera token  \n- [x] Spara i localStorage  \n- [x] Skicka med i API-anrop  \n### \n🛡️ Skydda routes\n\n- [x] Skapa `verifyToken`-middleware  \n- [ ] Använd `verifyToken` i `petsRoutes.ts`  \n- [ ] Använd `verifyToken` i `healthRoutes.ts`  \n- [x] Testa att skyddade routes returnerar 401 utan token  s  \n\n🧍‍♀️ Knyt data till användare\n\n- [ ] Filtrera GET i `petsController` baserat på `req.user.id`  \n- [ ] Filtrera GET i `healthController` baserat på `req.user.id`  \n- [ ] Lägg till `userId` i POST vid ny djur-/hälsopost  \n- [ ] Testa att en användare bara ser sina egna djur och hälsoposter  \n   \n   ANVÄNDARE\n- [x] skapa form för registrering  \n- [x]  skapa form för login\n🖊️ Redigera & ta bort\n\n- [ ] Skapa PUT-routes i backend (hälsa/skötsel)  \n- [ ] Skapa DELETE-routes i backend  \n- [ ] Lägg till redigeringsformulär i frontend  \n- [ ] Lägg till “Ta bort”-knapp per post  \n- [ ] Visa bekräftelse innan radering  \n- [ ] Visa feedback efter ändring eller borttagning  \n\n🖊️ Redigera & ta bort\n\n- [ ] Skapa PUT-routes i backend (hälsa/skötsel)  \n- [ ] Skapa DELETE-routes i backend  \n- [ ] Lägg till redigeringsformulär i frontend  \n- [ ] Lägg till “Ta bort”-knapp per post  \n- [ ] Visa bekräftelse innan radering  \n- [ ] Visa feedback efter ändring eller borttagning  \n\n\nStyle i css\n- [ ] ändra font size\n- [ ] välja en font style\n- [ ] göra en box även på stor skärm\n","x":-920,"y":-1540,"width":520,"height":700},
+		{"id":"a1c1a51a38d295cb","type":"text","text":"# 🟩 Nästa steg","x":-160,"y":-1580,"width":328,"height":80},
+		{"id":"d5dd295659c33371","type":"text","text":"\n🖊️ Redigera & ta bort poster  \n– PUT/DELETE för hälsa & skötsel  \n– Bekräftelse & UI-formulär  \n\n☑️ Checkbox-status  \n– Spara “klar” i databas  \n– Visuell markering i UI  \n\n🔔 Dagens att göra  \n– Filtrera uppgifter med datum = idag  \n– Visa i topp på startsidan  ","x":-140,"y":-1320,"width":308,"height":380},
+		{"id":"c77a07a1e36fd32b","type":"text","text":"# 🟦 Senare / Vision","x":-620,"y":-540,"width":320,"height":80},
+		{"id":"85d8e8ca81aca6c7","type":"text","text":"\n\n🌓 Tema  \n– Dark/Light med useContext  \n\n💬 Feedback vid sparande  \n– Visa \"Sparat!\" eller toast  \n\n📤 Export till PDF  \n– Ladda ner hälsodata  \n\n👫 Delad djurdata  \n– Flera användare per djur  \n\n🎮 Gamification  \n– Belöningar vid skötsel  \n\n📱 Mobilvänlighet  \n– Responsivt UI & touchoptimering  \n\n🚀 Publicering  \n– Backend till Render  \n– Frontend till Netlify/Vercel  \n– Pitch & marknadsföring  \n","x":-574,"y":-420,"width":228,"height":740},
+		{"id":"c2ce9e485ec8c9f9","type":"text","text":"","x":-268,"y":-435,"width":250,"height":60},
+		{"id":"160fa551b6e68b75","type":"text","text":"# 🟨  Just nu / Fokus","x":-840,"y":-1740,"width":360,"height":80}
+	],
+	"edges":[
+		{"id":"4fd18a4fc1ad7d15","fromNode":"c77a07a1e36fd32b","fromSide":"bottom","toNode":"85d8e8ca81aca6c7","toSide":"top"},
+		{"id":"6672ad3f5abdb4d0","fromNode":"160fa551b6e68b75","fromSide":"bottom","toNode":"7fb9a8f05d5ce926","toSide":"top"},
+		{"id":"271265236fcfa087","fromNode":"a1c1a51a38d295cb","fromSide":"bottom","toNode":"d5dd295659c33371","toSide":"top"}
+	]
+}

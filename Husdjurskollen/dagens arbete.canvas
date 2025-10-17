@@ -1,0 +1,11 @@
+{
+	"nodes":[
+		{"id":"352648408f9ad664","type":"text","text":"# Dagens arbete","x":-200,"y":-460,"width":305,"height":110},
+		{"id":"ce85740ee12fe7e7","type":"text","text":"Idag har jag arbetat med designen, fixat flexbox, snyggat till layouten på startsida och kontosidan. \nnästa gång ska jag fixa log in formuläret","x":-760,"y":-290,"width":250,"height":250},
+		{"id":"75dcabc1a642dc80","type":"text","text":"2025-07-31","x":-760,"y":-350,"width":250,"height":60},
+		{"id":"5d364a5065d82cbe","type":"text","text":"2025-08-02","x":-510,"y":-350,"width":250,"height":60},
+		{"id":"e7a4f19f494a263b","type":"text","text":"påbörjar formregister.tsx\n\nska fortsätta med form delen. ","x":-510,"y":-290,"width":250,"height":125},
+		{"id":"b42a04900878bae0","x":-510,"y":-140,"width":250,"height":220,"type":"text","text":"2025-08-03\n\nfixat med registreringsformuläret\n\nimorgon ändra name till username i databasen \n\n"}
+	],
+	"edges":[]
+}
