@@ -5,10 +5,9 @@ import PetForm from "../components/PetForm";
 import UserForm from "../components/UserForm";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
-<<<<<<< HEAD
+
 import api from "../lib/api";
-=======
->>>>>>> parent of 8669658 (startat med login formuläret)
+
 
 // Typdefinitioner
 interface User {

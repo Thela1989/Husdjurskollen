@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -41,7 +40,7 @@ function Loginform() {
           <input
             type="email"
             value={email}
-            onChange={e => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
         </div>{" "}
@@ -50,7 +49,7 @@ function Loginform() {
           <input
             type="password"
             value={password}
-            onChange={e => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
             className="w-full border rounded px-3 py-2"
             required
           />
@@ -67,6 +66,3 @@ function Loginform() {
 }
 
 export default Loginform;
-=======
-//Inte börjat än!!! Denan ska styra funktion för inloggning
->>>>>>> parent of 8669658 (startat med login formuläret)
