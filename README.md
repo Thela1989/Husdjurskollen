@@ -1,39 +1,42 @@
-# 🐾 Husdjurskollen
+# Husdjurskollen
 
-**Husdjurskollen** är en app för husdjursägare som vill ha koll på skötsel, hälsa och viktiga uppgifter om sina djur – allt på ett och samma ställe.
+Husdjurskollen is a pet management app for pet owners who want to track care, health, and important daily information in one place.
 
-## 🚀 Funktioner
+## Project Status
 
-- Lägg till och redigera husdjur
-- Spara vaccinationer, avmaskningar, vikt och andra hälsohändelser
-- Skapa och bocka av skötseluppgifter
-- Enkel översikt per djur
-- Responsiv och modern design
+This project is currently under active development and is not finished yet.
 
-## 🛠️ Teknik
+## Features
 
-**Frontend:**
+- Add and edit pets
+- Track vaccinations, deworming, weight, and other health events
+- Create and complete pet care tasks
+- Get a simple overview for each pet
+- Responsive and modern interface
 
-- Vite + React + TypeScript
-- Tailwind CSS
+## Tech Stack
 
-**Backend:**
+Frontend:
 
-- Node.js + Express
-- SQLite (eller annan databas)
+- Vite
+- React
+- TypeScript
 
-## 📸 Skärmdumpar
+Backend:
 
-_Kommer snart..._ (eller lägg in bilder på UI:t här!)
+- Node.js
+- Express
+- SQLite (or another database)
 
-## 🔐 Licens
+## Screenshots
 
-Denna kod är skyddad av upphovsrätt och får **inte** kopieras, användas eller modifieras utan uttryckligt tillstånd från upphovsmakaren.
+Coming soon.
 
----
+## License
 
-## 👩‍💻 Utvecklare
+This code is protected by copyright and may not be copied, used, or modified without explicit permission from the author.
 
-**Therese Lagerhäll**
-Utbildar sig till front-end-utvecklare vid IT-högskolan
-[LinkedIn-profil, Portfolio eller e-post här om du vill]
+## Developer
+
+Therese Lagerhall
+Front-end developer student at IT-Hogskolan
