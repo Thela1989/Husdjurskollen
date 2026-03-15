@@ -6,8 +6,7 @@ import UserForm from "../components/UserForm";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
 
-import api from "../lib/api";
-
+import { api } from "../lib/api";
 
 // Typdefinitioner
 interface User {
@@ -37,7 +36,6 @@ function Account() {
   const [loadingUser, setLoadingUser] = useState(true);
   const [errUser, setErrUser] = useState<string>("");
 
-<<<<<<< HEAD
   // Hjälpare: mappa olika svarformat till vår User
   const mapToUser = useCallback((data: any): User | null => {
     if (!data) return null;
@@ -81,7 +79,7 @@ function Account() {
       console.warn(
         "GET /api/auth/me misslyckades:",
         e1?.response?.status,
-        e1?.message
+        e1?.message,
       );
 
       // 2) Fallback: använd userId från localStorage och hämta /api/users/:id
@@ -106,7 +104,7 @@ function Account() {
         console.error(
           "Fallback /api/users/:id misslyckades:",
           e2?.response?.status,
-          e2?.message
+          e2?.message,
         );
         setUser(null);
         setErrUser(e2?.response?.data?.error || "Kunde inte hämta användare.");
@@ -125,52 +123,20 @@ function Account() {
     if (!user?.id) return;
     try {
       const res = await api.get("/api/pets");
-      const userPets = (res.data as Pet[]).filter(p => p.owner_id === user.id);
+      const userPets = (res.data as Pet[]).filter(
+        (p) => p.owner_id === user.id,
+      );
       setPets(userPets);
     } catch (e) {
       console.error("Kunde inte hämta husdjur:", e);
     }
   }, [user?.id]);
-=======
-  // Lägg till nytt husdjur
-  const handlePetCreated = (newPet: Pet) => {
-    setPets(prev => [...prev, newPet]);
-    setShowForm(false);
-  };
-
-  // Ta bort husdjur
-  const handleDelete = async (id: number) => {
-    try {
-      await axios.delete(`http://localhost:5000/pets/${id}`);
-      setPets(prev => prev.filter(p => p.id !== id));
-    } catch (error) {
-      console.error("Kunde inte ta bort husdjuret:", error);
-    }
-  };
-
-  // Hämta husdjur
-  const refreshingPets = () => {
-    axios.get("http://localhost:5000/pets").then(res => {
-      const userPets = res.data.filter((pet: Pet) => pet.owner_id === user?.id);
-      setPets(userPets);
-    });
-  };
-
-  // Hämta användare
-  useEffect(() => {
-    axios.get("http://localhost:5000/users").then(res => {
-      const found = res.data.find((u: User) => u.id === 2); // <-- justera om du har inloggning
-      setUser(found);
-    });
-    refreshingPets();
-  }, []);
->>>>>>> parent of 8669658 (startat med login formuläret)
 
   // Ta bort husdjur
   const handleDelete = useCallback(async (id: number) => {
     try {
       await api.delete(`/api/pets/${id}`);
-      setPets(prev => prev.filter(p => p.id !== id));
+      setPets((prev) => prev.filter((p) => p.id !== id));
     } catch (e) {
       console.error("Kunde inte ta bort husdjuret:", e);
     }
@@ -209,14 +175,7 @@ function Account() {
                 email={user.email}
                 onEditDone={async () => {
                   setEditUserMode(false);
-<<<<<<< HEAD
                   await loadUser(); // uppdatera visningen efter PUT
-=======
-                  axios.get("http://localhost:5000/users").then(res => {
-                    const found = res.data.find((u: User) => u.id === 2);
-                    setUser(found);
-                  });
->>>>>>> parent of 8669658 (startat med login formuläret)
                 }}
               />
             ) : (
@@ -236,8 +195,8 @@ function Account() {
 
             {showForm && !editingPet && (
               <PetForm
-                onPetCreated={newPet => {
-                  setPets(prev => [...prev, newPet]);
+                onPetCreated={(newPet) => {
+                  setPets((prev) => [...prev, newPet]);
                   setShowForm(false);
                 }}
                 ownerId={user.id}
@@ -248,7 +207,7 @@ function Account() {
 
             {pets.length > 0 ? (
               <div className="flex flex-wrap gap-4">
-                {pets.map(pet => (
+                {pets.map((pet) => (
                   <div
                     key={pet.id}
                     className="border rounded-lg p-4 w-full sm:w-[250px] bg-gray-50"
@@ -261,8 +220,8 @@ function Account() {
                           setEditingPet(null);
                           loadPets();
                         }}
-                        onPetCreated={p => {
-                          setPets(prev => [...prev, p]);
+                        onPetCreated={(p) => {
+                          setPets((prev) => [...prev, p]);
                           setEditingPet(null);
                         }}
                       />
@@ -321,7 +280,7 @@ function Account() {
             <button
               onClick={() => {
                 setEditingPet(null);
-                setShowForm(prev => !prev);
+                setShowForm((prev) => !prev);
               }}
               className="mt-4 bg-green-600 text-white px-4 py-2 rounded-full"
             >
