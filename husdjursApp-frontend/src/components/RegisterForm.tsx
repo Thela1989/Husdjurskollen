@@ -1,7 +1,7 @@
 // src/components/RegisterForm.tsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../lib/api";
+import { api } from "../lib/api";
 
 function RegisterForm() {
   const navigate = useNavigate();
@@ -60,28 +60,28 @@ function RegisterForm() {
           type="text"
           placeholder="Förnamn"
           value={first_name}
-          onChange={e => setFirstName(e.target.value)}
+          onChange={(e) => setFirstName(e.target.value)}
           required
         />
         <input
           type="text"
           placeholder="Efternamn"
           value={last_name}
-          onChange={e => setLastName(e.target.value)}
+          onChange={(e) => setLastName(e.target.value)}
           required
         />
         <input
           type="email"
           placeholder="E-post"
           value={email}
-          onChange={e => setEmail(e.target.value)}
+          onChange={(e) => setEmail(e.target.value)}
           required
         />
         <input
           type="password"
           placeholder="Lösenord"
           value={password}
-          onChange={e => setPassword(e.target.value)}
+          onChange={(e) => setPassword(e.target.value)}
           required
         />
         <button type="submit" disabled={loading}>

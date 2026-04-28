@@ -49,24 +49,20 @@ function UserForm({ userId, onEditDone, name = "", email = "" }: Props) {
         type="text"
         placeholder="Namn"
         value={userName}
-        onChange={e => setUserName(e.target.value)}
+        onChange={(e) => setUserName(e.target.value)}
         required
       />
       <input
         type="email"
         placeholder="E-post"
         value={userEmail}
-        onChange={e => setUserEmail(e.target.value)}
+        onChange={(e) => setUserEmail(e.target.value)}
         required
       />
       {!userId && (
         <input
           type="password"
           placeholder="Lösenord"
-          onChange={e => {
-            // Lägg till lösenord i requesten sen
-            // Här förenklat med hårdkodad sträng
-          }}
           disabled
           className="opacity-50 cursor-not-allowed"
         />

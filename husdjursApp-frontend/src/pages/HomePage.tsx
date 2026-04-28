@@ -26,17 +26,16 @@ function HomePage() {
         </h1>
 
         <p id="WelcomeP">Håll koll på ditt husdjurs vardag, behov och hälsa!</p>
-
-        {!showRegister && !showLogin && (
-          <div className="button-row">
-            <button onClick={handleLoginClick}>Logga in</button>
-            <button onClick={handleRegisterClick}>Registrera dig</button>
-          </div>
-        )}
-
-        {showLogin && <LoginForm />}
-        {showRegister && <RegisterForm />}
       </div>
+      {!showRegister && !showLogin && (
+        <div className="button-row">
+          <button onClick={handleLoginClick}>Logga in</button>
+          <button onClick={handleRegisterClick}>Registrera dig</button>
+        </div>
+      )}
+
+      {showLogin && <LoginForm />}
+      {showRegister && <RegisterForm />}
     </div>
   );
 }
