@@ -24,6 +24,10 @@ body {
   overscroll-behavior: none;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 html {
   min-height: 100%;
   background-image: url("/testbilder/background.jpg");
@@ -41,6 +45,7 @@ body {
   font-family: inherit;
   background: transparent;
   overflow-x: hidden;
+  display: flex;
 }
 
 .PetCare-List {
@@ -50,20 +55,28 @@ body {
 .hero-section {
   min-height: 100vh;
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  align-items: center;
   text-align: center;
-  box-sizing: border-box;
   flex-direction: column;
+  padding: 1rem;
+  padding-bottom: clamp(2rem, 8vh, 5rem);
 }
 
 .hero-content {
-  padding-top: 200px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  margin-bottom: 100px;
+  width: min(92vw, 760px);
 }
 
 #WelcomeP {
   color: #ffffff;
-  font-size: 15px;
+  font-size: clamp(0.95rem, 1.8vw, 1.15rem);
+  max-width: 62ch;
+  margin-inline: auto;
 
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
 }
@@ -84,7 +97,7 @@ body {
 }
 
 @media (max-width: 768px) {
-  § html,
+  html,
   body {
     min-height: 100vh;
     height: 100%;
@@ -94,6 +107,7 @@ body {
     background-size: cover;
     background-attachment: scroll;
     background-color: #000;
+    display: flex;
   }
 
   .PetName {
@@ -113,31 +127,63 @@ body {
   }
 
   button {
-    font-size: 0.9rem;
+    width: min(88vw, 320px);
+    font-size: 0.95rem;
     padding: 0.5rem 1rem;
+    justify-content: flex-end;
+  }
+
+  .button-row {
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 0.75rem;
+  }
+
+  .hero-section {
+    min-height: 100svh;
+
+    padding-bottom: clamp(2rem, 10svh, 6rem);
+  }
+
+  .hero-content {
+    padding-top: 0;
+    padding-inline: 0.4rem;
   }
 
   .welcomeText {
-    font-size: 25px;
-    margin-top: 40px;
+    font-size: clamp(1.8rem, 9vw, 2.4rem);
+    margin-top: 0;
+    line-height: 1.1;
     text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
     color: white;
   }
 }
 
-.hero-section {
-  align-items: center;
+@media (min-width: 769px) and (max-width: 1100px) {
+  .hero-section {
+    padding-bottom: clamp(2.5rem, 9vh, 6rem);
+  }
 
-  justify-content: center;
-  display: flex;
-  text-align: center;
-  min-height: 100vh;
-  padding: 1rem;
+  .hero-content {
+    width: min(86vw, 700px);
+    padding-top: clamp(3rem, 10vh, 7rem);
+  }
+
+  .button-row {
+    gap: 0.8rem;
+  }
 }
 
 @media (min-width: 768px) {
   .account-container {
     max-width: 700px;
+  }
+
+  .button-row {
+    flex-direction: row;
   }
 }
 .p-4 {
@@ -148,10 +194,10 @@ body {
 }
 button {
   border-radius: 20px !important;
-  width: 200px;
+  width: clamp(150px, 22vw, 220px);
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
-  font-size: 0.8em;
+  font-size: clamp(0.85rem, 1.3vw, 1rem);
   font-weight: 500;
   background-color: #1a1a1a;
   color: white;
@@ -195,6 +241,16 @@ a:hover {
   flex-wrap: wrap;
 }
 
+.button-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  width: min(92vw, 820px);
+  margin-inline: auto;
+}
+
 .button-row button {
   border: solid white 1.5px;
 }
@@ -214,6 +270,8 @@ input {
   color: #ffffff;
   background-color: #1a1a1a;
   padding: 0.5rem;
+  width: min(92vw, 360px);
+  max-width: 100%;
 }
 
 ::placeholder {

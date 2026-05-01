@@ -3,6 +3,7 @@ import { FaPaw } from "react-icons/fa";
 import { useState } from "react";
 import RegisterForm from "../components/RegisterForm";
 import LoginForm from "../components/LoginForm";
+import { Button } from "@mantine/core";
 
 function HomePage() {
   const [showRegister, setShowRegister] = useState(false);
@@ -29,6 +30,7 @@ function HomePage() {
       </div>
       {!showRegister && !showLogin && (
         <div className="button-row">
+          <Button color="black">Hej</Button>
           <button onClick={handleLoginClick}>Logga in</button>
           <button onClick={handleRegisterClick}>Registrera dig</button>
         </div>
