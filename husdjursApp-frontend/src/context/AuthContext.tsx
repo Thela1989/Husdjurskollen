@@ -3,8 +3,7 @@ import { api, setAuthToken } from "../lib/api";
 
 type User = {
   id: number;
-  first_name: string;
-  last_name: string;
+  name: string;
   email: string;
 } | null;
 
@@ -12,12 +11,7 @@ type AuthCtx = {
   user: User;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (
-    first_name: string,
-    last_name: string,
-    email: string,
-    password: string
-  ) => Promise<void>;
+  register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
 };
 
@@ -38,7 +32,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setAuthToken(token);
     api
       .get("/auth/me")
-      .then(r => setUser(r.data.user))
+      .then((r) => setUser(r.data.user))
       .catch(() => setAuthToken(undefined))
       .finally(() => setLoading(false));
   }, []);
@@ -49,15 +43,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setUser(data.user);
   };
 
-  const register = async (
-    first_name: string,
-    last_name: string,
-    email: string,
-    password: string
-  ) => {
+  const register = async (name: string, email: string, password: string) => {
     const { data } = await api.post("/auth/register", {
-      first_name,
-      last_name,
+      name,
       email,
       password,
     });

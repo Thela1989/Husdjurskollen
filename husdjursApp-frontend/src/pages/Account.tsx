@@ -5,8 +5,13 @@ import PetForm from "../components/PetForm";
 import UserForm from "../components/UserForm";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
-
 import { api } from "../lib/api";
+import { setAuthToken } from "../lib/api";
+
+const token = localStorage.getItem("token");
+if (token) {
+  setAuthToken(token);
+}
 
 // Typdefinitioner
 interface User {
@@ -43,19 +48,15 @@ function Account() {
     if (data.user?.id) {
       return {
         id: data.user.id,
-        name:
-          data.user.name ??
-          `${data.user.first_name ?? ""} ${data.user.last_name ?? ""}`.trim(),
+        name: data.user.name ?? `${data.user.name ?? ""} `.trim(),
         email: data.user.email,
       };
     }
-    // Alternativt: { id, first_name, last_name, email }
-    if (data.id && (data.name || data.first_name)) {
+
+    if (data.id && data.name) {
       return {
         id: data.id,
-        name:
-          data.name ??
-          `${data.first_name ?? ""} ${data.last_name ?? ""}`.trim(),
+        name: data.name ?? `${data.name ?? ""} `.trim(),
         email: data.email,
       };
     }
@@ -68,7 +69,7 @@ function Account() {
     setErrUser("");
     try {
       // 1) Primärt: /auth/me (kräver att backend har denna)
-      const res = await api.get("/api/auth/me");
+      const res = await api.get("/auth/me");
       const u = mapToUser(res.data);
       if (u) {
         setUser(u);
@@ -77,7 +78,7 @@ function Account() {
       throw new Error("auth/me gav inget användarobjekt");
     } catch (e1: any) {
       console.warn(
-        "GET /api/auth/me misslyckades:",
+        "GET /auth/me misslyckades:",
         e1?.response?.status,
         e1?.message,
       );
@@ -91,18 +92,17 @@ function Account() {
         return;
       }
       try {
-        const res2 = await api.get(`/api/users/${id}`);
+        const res2 = await api.get(`/users/${id}`);
         const u2 = mapToUser(res2.data) ?? res2.data; // stöd både {user} och direkt fält
         if (!u2?.id) throw new Error("users/:id gav inget användarobjekt");
         setUser({
           id: u2.id,
-          name:
-            u2.name ?? `${u2.first_name ?? ""} ${u2.last_name ?? ""}`.trim(),
+          name: u2.name ?? `${u2.name ?? ""} `.trim(),
           email: u2.email,
         });
       } catch (e2: any) {
         console.error(
-          "Fallback /api/users/:id misslyckades:",
+          "Fallback /users/:id misslyckades:",
           e2?.response?.status,
           e2?.message,
         );
@@ -122,7 +122,7 @@ function Account() {
   const loadPets = useCallback(async () => {
     if (!user?.id) return;
     try {
-      const res = await api.get("/api/pets");
+      const res = await api.get("/pets");
       const userPets = (res.data as Pet[]).filter(
         (p) => p.owner_id === user.id,
       );
@@ -135,7 +135,7 @@ function Account() {
   // Ta bort husdjur
   const handleDelete = useCallback(async (id: number) => {
     try {
-      await api.delete(`/api/pets/${id}`);
+      await api.delete(`/pets/${id}`);
       setPets((prev) => prev.filter((p) => p.id !== id));
     } catch (e) {
       console.error("Kunde inte ta bort husdjuret:", e);
@@ -170,6 +170,7 @@ function Account() {
           <>
             {editUserMode ? (
               <UserForm
+                mode="edit"
                 userId={user.id}
                 name={user.name}
                 email={user.email}

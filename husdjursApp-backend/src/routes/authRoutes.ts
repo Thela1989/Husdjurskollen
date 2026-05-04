@@ -14,11 +14,10 @@ function signToken(userId: number) {
 
 /** POST /api/auth/register */
 const registerUser: RequestHandler = async (req, res) => {
-  const { first_name, last_name, email, password } = req.body ?? {};
-  if (!first_name || !last_name || !email || !password) {
-    res
-      .status(400)
-      .json({ error: "Förnamn, efternamn, e‑post och lösenord krävs" });
+  console.log("BODY:", req.body);
+  const { name, email, password } = req.body ?? {};
+  if (!name || !email || !password) {
+    res.status(400).json({ error: "..." });
     return;
   }
 
@@ -27,21 +26,16 @@ const registerUser: RequestHandler = async (req, res) => {
       String(email).toLowerCase().trim(),
     ]);
     if ((exists.rowCount ?? 0) > 0) {
-      res.status(400).json({ error: "E‑postadressen är redan registrerad" });
+      res.status(400).json({ error: "E-postadressen är redan registrerad" });
       return;
     }
 
     const hash = await bcrypt.hash(String(password), 10);
     const result = await pool.query(
-      `INSERT INTO users (first_name, last_name, email, password)
-       VALUES ($1,$2,$3,$4)
-       RETURNING id, first_name, last_name, email`,
-      [
-        String(first_name).trim(),
-        String(last_name).trim(),
-        String(email).toLowerCase().trim(),
-        hash,
-      ]
+      `INSERT INTO users (name, email, password)
+ VALUES ($1,$2,$3)
+ RETURNING id, name, email`,
+      [String(name).trim(), String(email).toLowerCase().trim(), hash],
     );
 
     const user = result.rows[0];
@@ -89,19 +83,21 @@ const loginUser: RequestHandler = async (req, res) => {
       token,
       user: {
         id: u.id,
-        first_name: u.first_name,
-        last_name: u.last_name,
+        name: u.name,
         email: u.email,
       },
     });
-  } catch (error) {
-    console.error("Fel vid inloggning:", error);
-    res.status(500).json({ error: "Serverfel vid inloggning" });
+  } catch (error: any) {
+    console.error("Fel vid registrering:", error);
+    res.status(500).json({ error: "Serverfel vid registrering" });
+    return;
   }
 };
 
 /** GET /api/auth/me (skyddad) */
 const meHandler: RequestHandler = async (req, res) => {
+  console.log("userId:", req.userId);
+  console.log("type:", typeof req.userId);
   try {
     if (!req.userId) {
       res.status(401).json({ error: "Saknar behörighet" });
@@ -109,8 +105,8 @@ const meHandler: RequestHandler = async (req, res) => {
     }
 
     const { rows, rowCount } = await pool.query(
-      "SELECT id, first_name, last_name, email FROM users WHERE id = $1",
-      [req.userId]
+      "SELECT id, name, email FROM users WHERE id = $1",
+      [req.userId],
     );
     if (!rowCount) {
       res.status(404).json({ error: "Användare hittades inte" });

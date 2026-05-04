@@ -1,73 +1,98 @@
 import { useState } from "react";
-import axios from "axios";
+import { Navigate, useNavigate } from "react-router-dom";
+
+import { useForm } from "@mantine/form";
+import { TextInput, Button, Title, PasswordInput } from "@mantine/core";
+
+import { api, setAuthToken } from "../lib/api";
 
 interface Props {
-  userId?: number; // Om den finns: uppdatera, annars: registrera ny
+  mode: "register" | "login" | "edit";
+  userId?: number;
   onEditDone?: () => void;
   name?: string;
   email?: string;
 }
 
-function UserForm({ userId, onEditDone, name = "", email = "" }: Props) {
-  const [userName, setUserName] = useState(name);
-  const [userEmail, setUserEmail] = useState(email);
+function UserForm({ mode, userId, onEditDone, name = "", email = "" }: Props) {
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const form = useForm({
+    initialValues: {
+      name: name,
+      email: email,
+      password: "",
+    },
+  });
+  const handleSubmit = form.onSubmit(async (values) => {
     try {
-      if (userId) {
-        // Uppdatera befintlig användare
-        await axios.put(`http://localhost:5000/users/${userId}`, {
-          name: userName,
-          email: userEmail,
+      if (mode === "edit" && userId) {
+        await api.put(`/users/${userId}`, {
+          name: values.name,
+          email: values.email,
         });
         setMessage("Användare uppdaterad ✅");
-      } else {
-        // Registrera ny användare
-        await axios.post("http://localhost:5000/api/register", {
-          username: userName,
-          email: userEmail,
-          password: "test1234", // Tillfälligt – vi kan lägga till lösenordsfält också
+      }
+
+      if (mode === "register") {
+        console.log("SKICKAR:", values);
+        const res = await api.post("/auth/register", {
+          name: values.name,
+          email: values.email,
+          password: values.password,
         });
-        setMessage("Användare registrerad 🎉");
+
+        setAuthToken(res.data.token);
+
+        navigate("/account");
+      }
+
+      if (mode === "login") {
+        const res = await api.post("/auth/login", {
+          email: values.email,
+          password: values.password,
+        });
+
+        setAuthToken(res.data.token);
+        setMessage("Inloggad ✅");
       }
 
       onEditDone?.();
     } catch (error) {
-      console.error("Fel vid användarhantering:", error);
+      console.error(error);
       setMessage("Något gick fel ❌");
     }
-  };
+  });
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-2 max-w-sm">
-      <h2>{userId ? "Redigera användare" : "Registrera användare"}</h2>
+      <h2>
+        {mode === "register" && "Registrera"}
+        {mode === "login" && "Logga in"}
+        {mode === "edit" && "Redigera användare"}
+      </h2>
 
-      <input
-        type="text"
-        placeholder="Namn"
-        value={userName}
-        onChange={(e) => setUserName(e.target.value)}
-        required
-      />
-      <input
-        type="email"
-        placeholder="E-post"
-        value={userEmail}
-        onChange={(e) => setUserEmail(e.target.value)}
-        required
-      />
-      {!userId && (
-        <input
-          type="password"
-          placeholder="Lösenord"
-          disabled
-          className="opacity-50 cursor-not-allowed"
-        />
+      {/* Namn */}
+      {mode !== "login" && (
+        <TextInput label="Namn" {...form.getInputProps("name")} />
       )}
-      <button type="submit">{userId ? "Spara ändringar" : "Registrera"}</button>
+
+      {/* Email */}
+      <TextInput label="E-post" {...form.getInputProps("email")} />
+
+      {/* Lösenord */}
+      {mode !== "edit" && (
+        <PasswordInput label="Lösenord" {...form.getInputProps("password")} />
+      )}
+
+      {/* Knapp */}
+      <Button type="submit">
+        {mode === "register" && "Registrera"}
+        {mode === "login" && "Logga in"}
+        {mode === "edit" && "Spara"}
+      </Button>
+
       {message && <p>{message}</p>}
     </form>
   );

@@ -67,7 +67,7 @@ router.get(
   async (req: AuthRequest, res: Response): Promise<void> => {
     try {
       const result = await pool.query(
-        "SELECT id, first_name, last_name, email FROM users WHERE id = $1",
+        "SELECT id, name, email FROM users WHERE id = $1",
         [req.user?.userId]
       );
 

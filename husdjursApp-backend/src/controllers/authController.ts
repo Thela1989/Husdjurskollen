@@ -16,8 +16,8 @@ function signToken(userId: number) {
 function mapUser(row: any) {
   return {
     id: row.id,
-    first_name: row.first_name,
-    last_name: row.last_name,
+    name: row.name,
+
     email: row.email,
   };
 }
@@ -27,18 +27,17 @@ function mapUser(row: any) {
 // =========================
 export const register = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<Response> => {
   try {
-    let { first_name, last_name, email, password } = req.body ?? {};
+    let { name, email, password } = req.body ?? {};
 
     // Trim & basvalidering
-    first_name = (first_name ?? "").toString().trim();
-    last_name = (last_name ?? "").toString().trim();
+    name = (name ?? "").toString().trim();
     email = (email ?? "").toString().trim().toLowerCase();
     password = (password ?? "").toString();
 
-    if (!first_name || !last_name || !email || !password) {
+    if (!name || !email || !password) {
       return res.status(400).json({ ok: false, error: "Alla fält krävs" });
     }
     if (password.length < 6) {
@@ -60,10 +59,10 @@ export const register = async (
     // Hash & spara
     const hash = await bcrypt.hash(password, 10);
     const result = await pool.query(
-      `INSERT INTO users (first_name, last_name, email, password)
-       VALUES ($1, $2, $3, $4)
-       RETURNING id, first_name, last_name, email`,
-      [first_name, last_name, email, hash]
+      `INSERT INTO users (name, email, password)
+       VALUES ($1, $2, $3)
+       RETURNING id, name, email`,
+      [name, email, hash],
     );
 
     const user = mapUser(result.rows[0]);
@@ -107,7 +106,7 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
 
     const userResult = await pool.query(
       "SELECT * FROM users WHERE email = $1",
-      [email]
+      [email],
     );
     if (userResult.rowCount === 0) {
       return res
@@ -146,7 +145,7 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
 // ===================================
 export const me = async (
   req: Request & { userId?: number },
-  res: Response
+  res: Response,
 ): Promise<Response> => {
   try {
     if (!req.userId) {
@@ -155,8 +154,8 @@ export const me = async (
         .json({ ok: false, error: "Ingen token eller ogiltig token" });
     }
     const result = await pool.query(
-      "SELECT id, first_name, last_name, email FROM users WHERE id = $1",
-      [req.userId]
+      "SELECT id, name, email FROM users WHERE id = $1",
+      [req.userId],
     );
     if (result.rowCount === 0) {
       return res.status(404).json({ ok: false, error: "User not found" });

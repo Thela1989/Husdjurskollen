@@ -1,8 +1,8 @@
 // src/pages/HomePage.tsx
 import { FaPaw } from "react-icons/fa";
 import { useState } from "react";
-import RegisterForm from "../components/RegisterForm";
-import LoginForm from "../components/LoginForm";
+import UserForm from "../components/UserForm";
+
 import { Button } from "@mantine/core";
 
 function HomePage() {
@@ -30,14 +30,18 @@ function HomePage() {
       </div>
       {!showRegister && !showLogin && (
         <div className="button-row">
-          <Button color="black">Hej</Button>
-          <button onClick={handleLoginClick}>Logga in</button>
-          <button onClick={handleRegisterClick}>Registrera dig</button>
+          <Button onClick={handleLoginClick} color="black">
+            Logga in
+          </Button>
+
+          <Button onClick={handleRegisterClick} color="black">
+            Registrera dig
+          </Button>
         </div>
       )}
 
-      {showLogin && <LoginForm />}
-      {showRegister && <RegisterForm />}
+      {showLogin && <UserForm mode="login" />}
+      {showRegister && <UserForm mode="register" />}
     </div>
   );
 }
