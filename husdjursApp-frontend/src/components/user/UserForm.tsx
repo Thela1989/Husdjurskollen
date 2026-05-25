@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { useForm } from "@mantine/form";
 import { TextInput, Button, Title, PasswordInput } from "@mantine/core";

@@ -2,10 +2,10 @@ import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-import VaccinationSection from "../components/VaccinationSection";
-import DewormingSection from "../components/DewormingSection";
-import WeightSection from "../components/WeightSection";
-import OtherSection from "../components/OtherSection";
+import VaccinationSection from "../components/health/VaccinationSection";
+import DewormingSection from "../components/health/DewormingSection";
+import WeightSection from "../components/health/WeightSection";
+import OtherSection from "../components/health/OtherSection";
 
 interface Pet {
   id: number;
@@ -28,19 +28,19 @@ const PetHealthPage = () => {
 
   useEffect(() => {
     // Hämta användaren (mockad med id = 2 just nu)
-    axios.get("http://localhost:5000/users").then(res => {
+    axios.get("http://localhost:5000/users").then((res) => {
       const foundUser = res.data.find((u: User) => u.id === 2);
       setUser(foundUser);
     });
 
     // Hämta djuret
-    axios.get(`http://localhost:5000/pets/${id}`).then(res => {
+    axios.get(`http://localhost:5000/pets/${id}`).then((res) => {
       setPet(res.data);
     });
   }, [id]);
 
   const toggleSection = (sectionName: string) => {
-    setOpenSection(prev => (prev === sectionName ? null : sectionName));
+    setOpenSection((prev) => (prev === sectionName ? null : sectionName));
   };
 
   if (!user || !pet) return <p className="p-4">Laddar...</p>;
@@ -55,7 +55,7 @@ const PetHealthPage = () => {
   }
 
   return (
-    <div className="p-4 max-w-2xl mx-auto">
+    <div className="page-with-gradient p-4 max-w-2xl mx-auto">
       <Link to="/" className="text-blue-600 underline block mb-4">
         ← Till startsidan
       </Link>

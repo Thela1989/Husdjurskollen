@@ -2,8 +2,10 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import Account from "./pages/Account";
-import ".//assets/index.css";
+import "./assets/index.css";
+
 import HealthPage from "./pages/HealthPage";
+import PetProfilePage from "./pages/PetProfilePage";
 
 function App() {
   return (
@@ -12,6 +14,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/account" element={<Account />} />
         <Route path="/pet/:id/health" element={<HealthPage />} />
+        <Route path="/pet/:id/profile" element={<PetProfilePage />} />
       </Routes>
     </Router>
   );

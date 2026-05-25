@@ -1,0 +1,45 @@
+:root {
+  --color-background-cream: #f7f5ef;
+  --color-card-light: #fdfdfc;
+  --color-card-middle: #eef7ef;
+  --color-card-cream: #d3e0d1;
+
+  --color-primary-green: #174f54;
+  --color-secondary-green: #54615e;
+  --color-soft-green: #d3e0d1;
+  --color-header-green-dark: #becdbf;
+  --color-olive: #9bb3ab;
+
+  --color-accent-gold: #eab7a8;
+  --color-soft-gold: #f4d6c7;
+
+  --color-text-dark: #174f54;
+  --color-text-light: #54615e;
+  --color-white: #ffffff;
+
+  --color-border-light: rgba(23, 79, 84, 0.12);
+  --color-border-medium: rgba(23, 79, 84, 0.22);
+  --color-placeholder: rgba(84, 97, 94, 0.65);
+
+  --color-heading-teal: #174f54;
+  --color-leaf-muted: #9bb3ab;
+  --color-error: #9a3b30;
+
+  --color-black: #000000;
+  --color-black-strong: #1a1a1a;
+  --color-black-soft: #333333;
+  --color-menu-icon: #174f54;
+  --color-avatar-ring: #fbf4f4;
+
+  --color-card-health: #eef7ef;
+  --color-card-care: #fff3e3;
+  --color-card-reminder: #fff0ea;
+  --color-card-safety: #ddeeef;
+
+  --shadow-soft: 0 6px 18px rgba(23, 79, 84, 0.12);
+  --shadow-card: 0 10px 24px rgba(23, 79, 84, 0.14);
+  --shadow-screen: 0 12px 32px rgba(23, 79, 84, 0.18);
+  --shadow-profile: 0 8px 18px rgba(23, 79, 84, 0.18);
+  --shadow-text: 1px 1px 3px rgba(0, 0, 0, 0.45);
+  --overlay-dark: rgba(0, 0, 0, 0.329);
+}

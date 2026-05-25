@@ -1,7 +1,7 @@
 // src/pages/HomePage.tsx
 import { FaPaw } from "react-icons/fa";
 import { useState } from "react";
-import UserForm from "../components/UserForm";
+import UserForm from "../components/user/UserForm";
 
 import { Button } from "@mantine/core";
 

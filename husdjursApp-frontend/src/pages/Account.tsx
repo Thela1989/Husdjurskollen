@@ -1,19 +1,16 @@
 // src/pages/Account.tsx
 import { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
-import PetForm from "../components/PetForm";
-import UserForm from "../components/UserForm";
-import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
-import { CgProfile } from "react-icons/cg";
-import { api } from "../lib/api";
-import { setAuthToken } from "../lib/api";
+import UserForm from "../components/user/UserForm";
+import { api, setAuthToken } from "../lib/api";
+import WaveHeader from "../components/layout/WaveHeader";
 
 const token = localStorage.getItem("token");
+
 if (token) {
   setAuthToken(token);
 }
 
-// Typdefinitioner
 interface User {
   id: number;
   name: string;
@@ -26,29 +23,23 @@ interface Pet {
   name: string;
   type: string;
   birth_date: string;
-  gender: string;
-  breed: string;
-  color: string;
   owner_id?: number;
 }
 
 function Account() {
   const [user, setUser] = useState<User | null>(null);
   const [pets, setPets] = useState<Pet[]>([]);
-  const [showForm, setShowForm] = useState(false);
-  const [editingPet, setEditingPet] = useState<Pet | null>(null);
   const [editUserMode, setEditUserMode] = useState(false);
   const [loadingUser, setLoadingUser] = useState(true);
-  const [errUser, setErrUser] = useState<string>("");
+  const [errUser, setErrUser] = useState("");
 
-  // Hjälpare: mappa olika svarformat till vår User
   const mapToUser = useCallback((data: any): User | null => {
     if (!data) return null;
-    // Vanligt: { user: { id, name, email } }
+
     if (data.user?.id) {
       return {
         id: data.user.id,
-        name: data.user.name ?? `${data.user.name ?? ""} `.trim(),
+        name: data.user.name,
         email: data.user.email,
       };
     }
@@ -56,247 +47,119 @@ function Account() {
     if (data.id && data.name) {
       return {
         id: data.id,
-        name: data.name ?? `${data.name ?? ""} `.trim(),
+        name: data.name,
         email: data.email,
       };
     }
+
     return null;
   }, []);
 
-  // Ladda inloggad användare
   const loadUser = useCallback(async () => {
     setLoadingUser(true);
     setErrUser("");
-    try {
-      // 1) Primärt: /auth/me (kräver att backend har denna)
-      const res = await api.get("/auth/me");
-      const u = mapToUser(res.data);
-      if (u) {
-        setUser(u);
-        return;
-      }
-      throw new Error("auth/me gav inget användarobjekt");
-    } catch (e1: any) {
-      console.warn(
-        "GET /auth/me misslyckades:",
-        e1?.response?.status,
-        e1?.message,
-      );
 
-      // 2) Fallback: använd userId från localStorage och hämta /api/users/:id
-      const id = localStorage.getItem("userId");
-      if (!id) {
-        setUser(null);
-        setErrUser("Ingen token eller userId — logga in igen.");
-        setLoadingUser(false);
-        return;
+    try {
+      const res = await api.get("/auth/me");
+      const currentUser = mapToUser(res.data);
+
+      if (!currentUser) {
+        throw new Error("Kunde inte läsa användaren.");
       }
-      try {
-        const res2 = await api.get(`/users/${id}`);
-        const u2 = mapToUser(res2.data) ?? res2.data; // stöd både {user} och direkt fält
-        if (!u2?.id) throw new Error("users/:id gav inget användarobjekt");
-        setUser({
-          id: u2.id,
-          name: u2.name ?? `${u2.name ?? ""} `.trim(),
-          email: u2.email,
-        });
-      } catch (e2: any) {
-        console.error(
-          "Fallback /users/:id misslyckades:",
-          e2?.response?.status,
-          e2?.message,
-        );
-        setUser(null);
-        setErrUser(e2?.response?.data?.error || "Kunde inte hämta användare.");
-      } finally {
-        setLoadingUser(false);
-      }
-      return;
+
+      setUser(currentUser);
+    } catch (error: any) {
+      console.error("Kunde inte hämta användare:", error);
+      setUser(null);
+      setErrUser(error?.response?.data?.error || "Kunde inte hämta användare.");
     } finally {
-      // Om första try:et lyckades går vi inte hit förrän efter setUser; bra att ha ändå
       setLoadingUser(false);
     }
   }, [mapToUser]);
 
-  // Hämta husdjur (behöver user.id)
   const loadPets = useCallback(async () => {
     if (!user?.id) return;
+
     try {
       const res = await api.get("/pets");
       const userPets = (res.data as Pet[]).filter(
-        (p) => p.owner_id === user.id,
+        (pet) => pet.owner_id === user.id,
       );
+
       setPets(userPets);
-    } catch (e) {
-      console.error("Kunde inte hämta husdjur:", e);
+    } catch (error) {
+      console.error("Kunde inte hämta husdjur:", error);
     }
   }, [user?.id]);
 
-  // Ta bort husdjur
-  const handleDelete = useCallback(async (id: number) => {
-    try {
-      await api.delete(`/pets/${id}`);
-      setPets((prev) => prev.filter((p) => p.id !== id));
-    } catch (e) {
-      console.error("Kunde inte ta bort husdjuret:", e);
-    }
-  }, []);
-
-  // När sidan mountar → hämta user
   useEffect(() => {
     loadUser();
   }, [loadUser]);
 
-  // När user finns → hämta husdjur
   useEffect(() => {
     loadPets();
   }, [loadPets]);
 
   return (
-    <div className="page-wrapper p-6">
-      <div className="max-w-3xl mx-auto bg-white p-4 rounded-lg shadow-md">
-        <Link className="text-blue-600 underline mb-2 inline-block" to="/">
-          Till startsidan
-        </Link>
-        <h1 className="text-2xl font-bold mb-4">Ditt konto</h1>
+    <main className="app-screen">
+      <WaveHeader />
 
+      <section className="home-content account-content">
         {loadingUser ? (
           <p>Laddar användare...</p>
         ) : errUser ? (
-          <p className="text-red-600">{errUser}</p>
+          <p className="error-text">{errUser}</p>
         ) : !user ? (
           <p>Ingen användare hittades. Prova logga in igen.</p>
+        ) : editUserMode ? (
+          <UserForm
+            mode="edit"
+            userId={user.id}
+            name={user.name}
+            email={user.email}
+            onEditDone={async () => {
+              setEditUserMode(false);
+              await loadUser();
+            }}
+          />
         ) : (
           <>
-            {editUserMode ? (
-              <UserForm
-                mode="edit"
-                userId={user.id}
-                name={user.name}
-                email={user.email}
-                onEditDone={async () => {
-                  setEditUserMode(false);
-                  await loadUser(); // uppdatera visningen efter PUT
-                }}
-              />
-            ) : (
-              <>
-                <h2 className="text-xl font-semibold mb-2 flex items-center gap-2">
-                  <CgProfile /> {user.name}
-                </h2>
-                <p className="mb-2">{user.email}</p>
-                <button
-                  onClick={() => setEditUserMode(true)}
-                  className="bg-black text-white px-4 py-2 rounded-full mb-4"
-                >
-                  Redigera användare <FaEdit className="inline ml-2" />
-                </button>
-              </>
-            )}
+            <h1 className="account-welcome-text">Hej {user.name}!</h1>
 
-            {showForm && !editingPet && (
-              <PetForm
-                onPetCreated={(newPet) => {
-                  setPets((prev) => [...prev, newPet]);
-                  setShowForm(false);
-                }}
-                ownerId={user.id}
-              />
-            )}
-
-            <h3 className="text-lg font-semibold mt-6 mb-2">Dina husdjur</h3>
-
-            {pets.length > 0 ? (
-              <div className="flex flex-wrap gap-4">
-                {pets.map((pet) => (
-                  <div
-                    key={pet.id}
-                    className="border rounded-lg p-4 w-full sm:w-[250px] bg-gray-50"
-                  >
-                    {editingPet?.id === pet.id ? (
-                      <PetForm
-                        petToEdit={pet}
-                        ownerId={user.id}
-                        onEditDone={() => {
-                          setEditingPet(null);
-                          loadPets();
-                        }}
-                        onPetCreated={(p) => {
-                          setPets((prev) => [...prev, p]);
-                          setEditingPet(null);
-                        }}
-                      />
-                    ) : (
-                      <>
-                        <p>
-                          <strong>Namn:</strong> {pet.name}
-                        </p>
-                        <p>
-                          <strong>Född:</strong>{" "}
-                          {new Date(pet.birth_date).toLocaleDateString("sv-SE")}
-                        </p>
-                        <p>
-                          <strong>Typ:</strong> {pet.type}
-                        </p>
-                        <p>
-                          <strong>Ras:</strong> {pet.breed}
-                        </p>
-                        <p>
-                          <strong>Färg:</strong> {pet.color}
-                        </p>
-                        <p>
-                          <strong>Kön:</strong> {pet.gender}
-                        </p>
-
-                        <div className="mt-3 space-y-2">
-                          <button
-                            onClick={() => setEditingPet(pet)}
-                            className="bg-gray-800 text-white px-3 py-1 rounded-full w-full"
-                          >
-                            Redigera djur <FaEdit className="inline ml-1" />
-                          </button>
-
-                          <button
-                            onClick={() => handleDelete(pet.id)}
-                            className="bg-red-600 text-white px-3 py-1 rounded-full w-full"
-                          >
-                            Ta bort <FaTrash className="inline ml-1" />
-                          </button>
-
-                          <Link to={`/pet/${pet.id}/health`}>
-                            <button className="bg-black text-white px-3 py-1 rounded-full w-full">
-                              {pet.name} – Hälsa
-                            </button>
-                          </Link>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                ))}
+            <section className="pet-preview-section">
+              <div className="section-title-row">
+                <h2>Dina husdjur</h2>
+                <span className="paw-small">🐾</span>
               </div>
-            ) : (
-              <p>Inga husdjur hittades.</p>
-            )}
+
+              <div className="pet-avatar-row">
+                {pets.map((pet) => (
+                  <Link key={pet.id} to={`/pet/${pet.id}`}>
+                    <div className="pet-avatar" aria-label={pet.name}>
+                      {pet.name.charAt(0)}
+                    </div>
+                  </Link>
+                ))}
+
+                <Link to="/pets/new">
+                  <button
+                    className="add-pet-button"
+                    aria-label="Lägg till husdjur"
+                  ></button>
+                </Link>
+              </div>
+            </section>
 
             <button
-              onClick={() => {
-                setEditingPet(null);
-                setShowForm((prev) => !prev);
-              }}
-              className="mt-4 bg-green-600 text-white px-4 py-2 rounded-full"
+              className="edit-profile-link"
+              onClick={() => setEditUserMode(true)}
             >
-              {showForm ? (
-                "Avbryt"
-              ) : (
-                <>
-                  Lägg till nytt djur <FaPlus className="inline ml-1" />
-                </>
-              )}
+              Redigera profil
             </button>
           </>
         )}
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
 
