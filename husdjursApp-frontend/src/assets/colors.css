@@ -9,10 +9,13 @@
   --color-soft-green: #d3e0d1;
   --color-header-green-dark: #becdbf;
   --color-olive: #9bb3ab;
+  --color-olive-dark: #799e7d;
+  --color-olive-light: #abe2b7;
 
   --color-accent-gold: #eab7a8;
   --color-soft-gold: #f4d6c7;
-
+  /*font-color*/
+  --color-accent-teal: #185d67;
   --color-text-dark: #174f54;
   --color-text-light: #54615e;
   --color-white: #ffffff;

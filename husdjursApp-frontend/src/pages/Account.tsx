@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import UserForm from "../components/user/UserForm";
 import { api, setAuthToken } from "../lib/api";
-import WaveHeader from "../components/layout/WaveHeader";
+import PetHeader from "../components/pets/PetHeader";
 
 const token = localStorage.getItem("token");
 
@@ -102,7 +102,15 @@ function Account() {
 
   return (
     <main className="app-screen">
-      <WaveHeader />
+      <PetHeader />
+
+      <div className="profile-image">
+        <img
+          src="/images/profile-placeholder.png"
+          alt="Profilbild"
+          className="profile-avatar"
+        />
+      </div>
 
       <section className="home-content account-content">
         {loadingUser ? (

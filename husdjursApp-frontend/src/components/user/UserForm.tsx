@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useForm } from "@mantine/form";
 import { TextInput, Button, Title, PasswordInput } from "@mantine/core";
 
-import { api, setAuthToken } from "../lib/api";
+import { api, setAuthToken } from "../../lib/api";
 
 interface Props {
   mode: "register" | "login" | "edit";
