@@ -10,11 +10,19 @@ interface Props {
   mode: "register" | "login" | "edit";
   userId?: number;
   onEditDone?: () => void;
+  onRegisterDone?: () => void;
   name?: string;
   email?: string;
 }
 
-function UserForm({ mode, userId, onEditDone, name = "", email = "" }: Props) {
+function UserForm({
+  mode,
+  userId,
+  onEditDone,
+  onRegisterDone,
+  name = "",
+  email = "",
+}: Props) {
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
@@ -44,6 +52,11 @@ function UserForm({ mode, userId, onEditDone, name = "", email = "" }: Props) {
         });
 
         setAuthToken(res.data.token);
+        if (onRegisterDone) {
+          onRegisterDone();
+        } else {
+          onEditDone?.();
+        }
 
         navigate("/account");
       }
@@ -59,6 +72,7 @@ function UserForm({ mode, userId, onEditDone, name = "", email = "" }: Props) {
       }
 
       onEditDone?.();
+      onRegisterDone?.();
     } catch (error) {
       console.error(error);
       setMessage("Något gick fel ❌");
