@@ -1,7 +1,7 @@
 import express, { Request, Response, RequestHandler } from "express";
 import cors from "cors";
 import authRoutes from "./routes/authRoutes";
-// import övriga routes vid behov
+import petRoutes from "./routes/petRoutes";
 
 const app = express();
 
@@ -14,7 +14,7 @@ const apiRoot: RequestHandler = (_req, res) => {
 app.get("/", apiRoot);
 
 app.use("/api/auth", authRoutes);
-// app.use("/api/users", userRoutes) osv
+app.use("/api/pets", petRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server kör på http://localhost:${PORT}`));

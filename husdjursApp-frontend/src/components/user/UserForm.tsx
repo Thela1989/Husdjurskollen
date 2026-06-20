@@ -2,9 +2,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useForm } from "@mantine/form";
-import { TextInput, Button, Title, PasswordInput } from "@mantine/core";
+import { TextInput, Button, PasswordInput } from "@mantine/core";
+import { FiArrowRight } from "react-icons/fi";
 
 import { api, setAuthToken } from "../../lib/api";
+import ImageUpload from "./ImageUploader";
 
 interface Props {
   mode: "register" | "login" | "edit";
@@ -25,6 +27,36 @@ function UserForm({
 }: Props) {
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
+
+  const sharedInputStyles = {
+    input: {
+      minHeight: "48px",
+      borderRadius: "999px",
+      backgroundColor: "#fefdf8",
+      border: "1px solid #e9e5de",
+      color: "var(--color-teal)",
+      fontFamily: "var(--font-ui)",
+      padding: "0.8rem 1rem",
+    },
+  };
+
+  const passwordInputStyles = {
+    input: {
+      minHeight: "48px",
+      borderRadius: "999px",
+      backgroundColor: "#fefdf8",
+      border: "1px solid #e9e5de",
+      color: "var(--color-teal)",
+      fontFamily: "var(--font-ui)",
+      padding: "0.8rem 2.8rem 0.8rem 1rem",
+    },
+    innerInput: {
+      borderRadius: "999px",
+      backgroundColor: "transparent",
+      color: "var(--color-teal)",
+      fontFamily: "var(--font-ui)",
+    },
+  };
 
   const form = useForm({
     initialValues: {
@@ -91,19 +123,47 @@ function UserForm({
       {mode !== "login" && (
         <TextInput label="Namn" {...form.getInputProps("name")} />
       )}
+      {mode !== "login" && (
+        <ImageUpload
+          onImageChange={(imageUrl: string) => {
+            localStorage.setItem("userAvatar", imageUrl);
+          }}
+        />
+      )}
 
       {/* Email */}
-      <TextInput label="E-post" {...form.getInputProps("email")} />
+      <TextInput
+        label="E-post"
+        styles={sharedInputStyles}
+        {...form.getInputProps("email")}
+      />
 
       {/* Lösenord */}
       {mode !== "edit" && (
-        <PasswordInput label="Lösenord" {...form.getInputProps("password")} />
+        <PasswordInput
+          label="Lösenord"
+          styles={passwordInputStyles}
+          {...form.getInputProps("password")}
+        />
       )}
 
       {/* Knapp */}
-      <Button type="submit">
-        {mode === "register" && "Registrera"}
-        {mode === "login" && "Logga in"}
+      <Button
+        type="submit"
+        className={mode !== "edit" ? "userform-submit-btn" : undefined}
+      >
+        {mode === "register" && (
+          <>
+            <span className="userform-submit-text">Registrera</span>
+            <FiArrowRight className="userform-submit-icon" aria-hidden="true" />
+          </>
+        )}
+        {mode === "login" && (
+          <>
+            <span className="userform-submit-text">Logga in</span>
+            <FiArrowRight className="userform-submit-icon" aria-hidden="true" />
+          </>
+        )}
         {mode === "edit" && "Spara"}
       </Button>
 

@@ -1,39 +1,51 @@
 :root {
-  /* Ny färgpalett */
-  --color-bg: #fffaf3;
-  --color-mint: #ccebd8;
-  --color-mint-light: #dff4e7;
-  --color-teal: #2f777c;
-  --color-blue: #59b4c9;
-  --color-pink: #f49899;
-  --color-peach: #f7c9b5;
-  --color-card: rgba(255, 255, 255, 0.78);
+  /* Mockup-palett */
+  --color-bg: #fef9f3;
+  --color-bg-light: #fdfcf8;
+  --color-bg-soft: #fdf8f2;
 
-  /* Koppling till dina befintliga variabelnamn */
+  --color-mint: #cddecb;
+  --color-mint-light: #e0e9dd;
+  --color-mint-extra-light: #eaf2e7;
+
+  --color-teal: #2d696f;
+  --color-teal-light: #3c7f86;
+  --color-teal-muted: #769596;
+
+  --color-pink: #f5c2ad;
+  --color-pink-light: #f9bfb4;
+  --color-peach: #f7d8c9;
+
+  --color-card: rgba(255, 252, 248, 0.88);
+  --color-input-bg: #fefdf8;
+  --color-input-border: #e9e5de;
+
+  /* Koppling till dina befintliga variabler */
   --color-background-cream: var(--color-bg);
-  --color-card-light: #fffdf8;
-  --color-card-middle: var(--color-mint-light);
+  --color-card-light: var(--color-bg-light);
+  --color-card-middle: var(--color-mint-extra-light);
   --color-card-cream: var(--color-mint);
 
   --color-primary-green: var(--color-teal);
   --color-secondary-green: #54615e;
   --color-soft-green: var(--color-mint);
   --color-header-green-dark: var(--color-mint);
-  --color-olive: var(--color-mint);
+
+  --color-olive: var(--color-teal-muted);
   --color-olive-dark: var(--color-teal);
   --color-olive-light: var(--color-mint-light);
 
-  --color-accent-gold: var(--color-peach);
-  --color-soft-gold: var(--color-pink);
+  --color-accent-gold: var(--color-pink);
+  --color-soft-gold: var(--color-peach);
+  --color-accent-teal: var(--color-teal-light);
 
-  --color-accent-teal: var(--color-blue);
   --color-text-dark: var(--color-teal);
   --color-text-light: #54615e;
   --color-white: #ffffff;
 
-  --color-border-light: rgba(47, 119, 124, 0.12);
-  --color-border-medium: rgba(47, 119, 124, 0.22);
-  --color-placeholder: rgba(84, 97, 94, 0.65);
+  --color-border-light: rgba(45, 105, 111, 0.12);
+  --color-border-medium: rgba(45, 105, 111, 0.22);
+  --color-placeholder: #9a9a9a;
 
   --color-heading-teal: var(--color-teal);
   --color-leaf-muted: var(--color-mint);
@@ -45,15 +57,15 @@
   --color-menu-icon: var(--color-teal);
   --color-avatar-ring: #fbf4f4;
 
-  --color-card-health: var(--color-mint-light);
+  --color-card-health: var(--color-mint-extra-light);
   --color-card-care: #fff3e3;
   --color-card-reminder: #fff0ea;
   --color-card-safety: #ddeeef;
 
-  --shadow-soft: 0 6px 18px rgba(47, 119, 124, 0.12);
-  --shadow-card: 0 10px 24px rgba(47, 119, 124, 0.14);
-  --shadow-screen: 0 12px 32px rgba(47, 119, 124, 0.18);
-  --shadow-profile: 0 8px 18px rgba(47, 119, 124, 0.18);
-  --shadow-text: 1px 1px 3px rgba(0, 0, 0, 0.45);
+  --shadow-soft: 0 6px 18px rgba(45, 105, 111, 0.12);
+  --shadow-card: 0 10px 24px rgba(45, 105, 111, 0.14);
+  --shadow-screen: 0 12px 32px rgba(45, 105, 111, 0.18);
+  --shadow-profile: 0 8px 18px rgba(45, 105, 111, 0.18);
+  --shadow-text: 1px 1px 3px rgba(0, 0, 0, 0.35);
   --overlay-dark: rgba(0, 0, 0, 0.329);
 }

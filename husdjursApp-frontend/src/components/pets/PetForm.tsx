@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { AvatarUploader } from "../user/AvatarUploader";
+import { api } from "../../lib/api";
 
-// 👇 Lägg till Pet-interfacet om det inte importeras från en gemensam types.ts
 interface Pet {
   id: number;
   name: string;
@@ -25,105 +25,174 @@ export default function PetForm({
   petToEdit,
   onEditDone,
 }: Props) {
+  const petTypes = ["Hund", "Katt", "Kanin", "Fagel", "Annat"];
+  const genderOptions = ["Hona", "Hane", "Okant"];
+
   const [name, setName] = useState("");
   const [type, setType] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [breed, setBreed] = useState("");
   const [gender, setGender] = useState("");
   const [color, setColor] = useState("");
+  const [selectedAvatar, setSelectedAvatar] = useState<string>("");
+  const [message, setMessage] = useState("");
 
-  // 🔄 Fyll i fälten om vi redigerar
   useEffect(() => {
-    if (petToEdit) {
-      setName(petToEdit.name);
-      setType(petToEdit.type);
-      setBirthDate(new Date(petToEdit.birth_date).toISOString().split("T")[0]);
-      setBreed(petToEdit.breed);
-      setGender(petToEdit.gender);
-      setColor(petToEdit.color);
-    }
+    if (!petToEdit) return;
+
+    setName(petToEdit.name);
+    setType(petToEdit.type);
+    setBirthDate(new Date(petToEdit.birth_date).toISOString().split("T")[0]);
+    setBreed(petToEdit.breed);
+    setGender(petToEdit.gender);
+    setColor(petToEdit.color);
+    setSelectedAvatar(localStorage.getItem(`petAvatar:${petToEdit.id}`) || "");
   }, [petToEdit]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setMessage("");
+
+    if (!name.trim()) {
+      setMessage("Du behöver ange ett namn på djuret.");
+      return;
+    }
 
     const payload = {
-      name,
-      type,
-      birth_date: birthDate,
+      name: name.trim(),
+      type: type.trim() || null,
+      birth_date: birthDate || null,
       owner_id: ownerId,
-      breed,
-      gender,
-      color,
+      breed: breed.trim() || null,
+      gender: gender.trim() || null,
+      color: color.trim() || null,
     };
 
     try {
       if (petToEdit) {
-        // Redigera djur
-        await axios.put(`http://localhost:5000/pets/${petToEdit.id}`, payload);
-        if (onEditDone) onEditDone();
+        await api.put(`/pets/${petToEdit.id}`, payload);
+
+        if (selectedAvatar) {
+          localStorage.setItem(`petAvatar:${petToEdit.id}`, selectedAvatar);
+        }
+
+        onEditDone?.();
       } else {
-        // Lägg till nytt djur
-        const response = await axios.post(
-          "http://localhost:5000/pets",
-          payload
-        );
+        const response = await api.post("/pets", payload);
+
+        if (selectedAvatar && response.data?.id) {
+          localStorage.setItem(`petAvatar:${response.data.id}`, selectedAvatar);
+        }
+
         onPetCreated(response.data);
       }
 
-      // Rensa fälten
+      setMessage(petToEdit ? "Husdjur uppdaterat." : "Husdjur tillagt.");
       setName("");
       setType("");
       setBirthDate("");
       setBreed("");
       setGender("");
       setColor("");
+      setSelectedAvatar("");
     } catch (error: any) {
-      console.error("Fel vid inskick:", error.message);
+      console.error("Fel vid inskick:", error);
+      setMessage(
+        error?.response?.data?.error || "Det gick inte att spara husdjuret.",
+      );
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>{petToEdit ? "Redigera husdjur" : "Lägg till ett husdjur"}</h2>
-      <input
-        type="text"
-        placeholder="Namn"
-        value={name}
-        onChange={e => setName(e.target.value)}
-      />
-      <input
-        type="date"
-        value={birthDate}
-        onChange={e => setBirthDate(e.target.value)}
-      />
-      <input
-        type="text"
-        placeholder="Typ av djur"
-        value={type}
-        onChange={e => setType(e.target.value)}
-      />
-      <input
-        type="text"
-        placeholder="Ras"
-        value={breed}
-        onChange={e => setBreed(e.target.value)}
-      />
-      <input
-        type="text"
-        placeholder="Färg"
-        value={color}
-        onChange={e => setColor(e.target.value)}
-      />
-      <input
-        type="text"
-        placeholder="Kön"
-        value={gender}
-        onChange={e => setGender(e.target.value)}
-      />
-      <button type="submit">
-        {petToEdit ? "Spara ändringar" : "Lägg till husdjur"}
+    <form onSubmit={handleSubmit} className="pet-form-shell">
+      <header className="pet-form-hero">
+        <h2>{petToEdit ? "Redigera husdjur" : "Lagg till ett husdjur"}</h2>
+        <p>
+          Fyll i information om ditt nya familjemedlem
+          <span className="pet-form-heart"></span>
+        </p>
+      </header>
+
+      <section className="pet-form-card">
+        <h3>
+          <span className="pet-form-badge">i</span>
+          Grundinformation
+        </h3>
+
+        <label className="pet-form-field">
+          <span className="pet-form-field-icon">*</span>
+          <input
+            type="text"
+            placeholder="Namn"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </label>
+
+        <label className="pet-form-field">
+          <span className="pet-form-field-icon">D</span>
+          <input
+            type="date"
+            value={birthDate}
+            onChange={(e) => setBirthDate(e.target.value)}
+          />
+        </label>
+
+        <label className="pet-form-field">
+          <span className="pet-form-field-icon">T</span>
+          <select value={type} onChange={(e) => setType(e.target.value)}>
+            <option value="">Typ av djur</option>
+            {petTypes.map((item) => (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="pet-form-field">
+          <span className="pet-form-field-icon">R</span>
+          <input
+            type="text"
+            placeholder="Ras"
+            value={breed}
+            onChange={(e) => setBreed(e.target.value)}
+          />
+        </label>
+
+        <label className="pet-form-field">
+          <span className="pet-form-field-icon">F</span>
+          <input
+            type="text"
+            placeholder="Farg"
+            value={color}
+            onChange={(e) => setColor(e.target.value)}
+          />
+        </label>
+
+        <label className="pet-form-field">
+          <span className="pet-form-field-icon">K</span>
+          <select value={gender} onChange={(e) => setGender(e.target.value)}>
+            <option value="">Kon</option>
+            {genderOptions.map((item) => (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            ))}
+          </select>
+        </label>
+      </section>
+
+      <section className="pet-form-avatar-section">
+        <h3>Profilbild</h3>
+        <AvatarUploader onAvatarChange={setSelectedAvatar} />
+      </section>
+
+      <button className="pet-form-submit" type="submit">
+        {petToEdit ? "Spara andringar" : "Lagg till husdjur"}
       </button>
+
+      {message && <p className="pet-form-message">{message}</p>}
     </form>
   );
 }
