@@ -1,0 +1,87 @@
+@media (max-width: 768px) {
+  html {
+    background-size: contain;
+
+    background-position: center;
+    width: 100%;
+    height: 400px;
+
+    background-attachment: scroll;
+
+    background-image: url("/testbilder/mobile.bg.jpg");
+  }
+
+  .hero-content {
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    max-width: 60%;
+    text-shadow: var(--shadow-text);
+
+    padding: 2rem;
+    border-radius: 12px;
+    background: var(--overlay-dark); /* mörk ton */
+    backdrop-filter: blur(4px); /* Prova 2px – 4px */
+    -webkit-backdrop-filter: blur(10px); /* för Safari-stöd */
+  }
+  form {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+  .register-form {
+    color: var(--color-white);
+    text-shadow:
+      -1px -1px 0 var(--color-black),
+      1px -1px 0 var(--color-black),
+      -1px 1px 0 var(--color-black),
+      1px 1px 0 var(--color-black);
+  }
+
+  .PetName {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .account-container {
+    padding: 1rem;
+    margin: 1rem auto;
+    max-width: 95vw;
+  }
+
+  button {
+    border-radius: 20px;
+    width: 200px;
+    border: 1px solid var(--color-white);
+    padding: 0.6em 1.2em;
+    font-size: 0.8em;
+    font-weight: 500;
+    background-color: var(--color-black-strong);
+    color: var(--color-white);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out; /* 👈 viktig! */
+    margin: 5px;
+  }
+
+  button:hover {
+    transform: scale(1.05);
+    background-color: var(--color-black-soft);
+    color: var(--color-white);
+    border-color: var(--color-white);
+  }
+
+  .welcomeText {
+    font-size: 2rem;
+    margin: 0;
+
+    text-shadow:
+      -1px -1px 0 var(--color-black),
+      1px -1px 0 var(--color-black),
+      -1px 1px 0 var(--color-black),
+      1px 1px 0 var(--color-black);
+  }
+}
