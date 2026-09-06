@@ -215,18 +215,18 @@ export default function UserForm({
 const styles = StyleSheet.create({
   form: {
     width: "100%",
-    gap: 14,
+    gap: 8,
   },
 
   heading: {
     color: "#2d696f",
     marginTop: 0,
-    marginBottom: 16,
+    marginBottom: 6,
     textAlign: "center",
 
     // Samma fontfamilj som gamla CSS när fonten är laddad.
     fontFamily: "CormorantGaramond",
-    fontSize: 28,
+    fontSize: 22,
     fontWeight: "600",
   },
 
@@ -243,7 +243,9 @@ const styles = StyleSheet.create({
 
   input: {
     width: "100%",
-    minHeight: 48,
+    minHeight: 42,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
     borderRadius: 999,
 
     backgroundColor: "#fefdf8",
@@ -252,15 +254,12 @@ const styles = StyleSheet.create({
 
     color: "#2d696f",
 
-    paddingVertical: 12.8,
-    paddingHorizontal: 16,
-
     fontFamily: "Quicksand",
   },
 
   passwordContainer: {
     width: "100%",
-    minHeight: 48,
+    minHeight: 42,
 
     flexDirection: "row",
     alignItems: "center",
@@ -312,7 +311,7 @@ const styles = StyleSheet.create({
 
   submitButton: {
     width: "100%",
-    minHeight: 52,
+    minHeight: 46,
 
     borderRadius: 999,
 

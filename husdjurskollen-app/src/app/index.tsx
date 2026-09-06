@@ -110,15 +110,22 @@ export default function HomeScreen() {
             <View style={styles.dividerLine} />
           </View>
 
-          <Text style={styles.noAccountText}>
-            Har du inget konto?{" "}
-            <Text
-              style={styles.registerLink}
-              onPress={handleRegisterClick}
-            >
-              Registrera dig!
+          {showLogin ? (
+            <Text style={styles.noAccountText}>
+              Har du inget konto?{" "}
+              <Text
+                style={styles.registerLink}
+                onPress={handleRegisterClick}
+              >
+                Registrera dig!
+              </Text>
             </Text>
-          </Text>
+          ) : (
+            <Text style={styles.noAccountText}>
+              Skapa ditt konto och kom igång med
+              Husdjurskollen.
+            </Text>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -134,7 +141,8 @@ const styles = StyleSheet.create({
   startPageContent: {
     flexGrow: 1,
     alignItems: "center",
-    paddingBottom: 32,
+    justifyContent: "space-between",
+    paddingBottom: 8,
   },
 
   startHero: {
@@ -174,10 +182,11 @@ const styles = StyleSheet.create({
   },
 
   startHeroImage: {
-    width: 165,
-    height: 165,
-    borderRadius: 82.5,
-    marginTop: 10,
+    height: 160,
+    width: 160,
+    borderRadius: 80,
+
+    marginTop: 6,
 
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.8)",
@@ -194,27 +203,28 @@ const styles = StyleSheet.create({
   },
 
   authCard: {
-    width: "92%",
-    maxWidth: 520,
-    marginTop: 14,
-    marginBottom: 20,
-    padding: 18,
+    width: "90%",
+    maxWidth: 440,
+    maxHeight: 500,
+    marginTop: 8,
+    marginBottom: 8,
+    padding: 12,
+    paddingBottom: 18,
     backgroundColor: "rgba(255,252,248,0.92)",
     borderWidth: 1,
     borderColor: "rgba(45,105,111,0.10)",
-    borderRadius: 28,
+    borderRadius: 22,
 
     shadowColor: "#2d696f",
     shadowOffset: {
       width: 0,
-      height: 14,
+      height: 10,
     },
-    shadowOpacity: 0.14,
-    shadowRadius: 34,
+    shadowOpacity: 0.12,
+    shadowRadius: 24,
 
-    elevation: 6,
+    elevation: 5,
   },
-
   authTabs: {
     width: "100%",
     flexDirection: "row",
@@ -253,7 +263,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-    marginVertical: 24,
+    marginTop: 14,
+    marginBottom: 10,
   },
 
   dividerLine: {
@@ -271,7 +282,8 @@ const styles = StyleSheet.create({
   noAccountText: {
     textAlign: "center",
     color: "#54615e",
-    fontSize: 15,
+    fontSize: 14,
+    marginBottom: 7,
   },
 
   registerLink: {
