@@ -1,198 +1,189 @@
-import { useEffect, useState } from "react";
-import { AvatarUploader } from "../user/AvatarUploader";
-import { api } from "../../lib/api";
+import { useState } from "react";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import { supabase } from "@/lib/supabase";
 
 interface Pet {
   id: number;
   name: string;
-  type: string;
-  birth_date: string;
-  breed: string;
-  gender: string;
-  color: string;
-}
+  type: string | null;
+  birth_date: string | null;
+  gender: string | null;
+  color: string | null;
+  breed: string | null;
 
+  owner_id: string;
+}
 interface Props {
-  onPetCreated: (newPet: Pet) => void;
-  ownerId: number;
-  petToEdit?: Pet;
-  onEditDone?: () => void;
+  onPetCreated?: (newPet: Pet) => void;
 }
-
 export default function PetForm({
   onPetCreated,
-  ownerId,
-  petToEdit,
-  onEditDone,
 }: Props) {
-  const petTypes = ["Hund", "Katt", "Kanin", "Fagel", "Annat"];
-  const genderOptions = ["Hona", "Hane", "Okant"];
-
   const [name, setName] = useState("");
   const [type, setType] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [breed, setBreed] = useState("");
   const [gender, setGender] = useState("");
   const [color, setColor] = useState("");
-  const [selectedAvatar, setSelectedAvatar] = useState<string>("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (!petToEdit) return;
-
-    setName(petToEdit.name);
-    setType(petToEdit.type);
-    setBirthDate(new Date(petToEdit.birth_date).toISOString().split("T")[0]);
-    setBreed(petToEdit.breed);
-    setGender(petToEdit.gender);
-    setColor(petToEdit.color);
-    setSelectedAvatar(localStorage.getItem(`petAvatar:${petToEdit.id}`) || "");
-  }, [petToEdit]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setMessage("");
-
-    if (!name.trim()) {
-      setMessage("Du behöver ange ett namn på djuret.");
-      return;
-    }
-
-    const payload = {
-      name: name.trim(),
-      type: type.trim() || null,
-      birth_date: birthDate || null,
-      owner_id: ownerId,
-      breed: breed.trim() || null,
-      gender: gender.trim() || null,
-      color: color.trim() || null,
-    };
-
-    try {
-      if (petToEdit) {
-        await api.put(`/pets/${petToEdit.id}`, payload);
-
-        if (selectedAvatar) {
-          localStorage.setItem(`petAvatar:${petToEdit.id}`, selectedAvatar);
-        }
-
-        onEditDone?.();
-      } else {
-        const response = await api.post("/pets", payload);
-
-        if (selectedAvatar && response.data?.id) {
-          localStorage.setItem(`petAvatar:${response.data.id}`, selectedAvatar);
-        }
-
-        onPetCreated(response.data);
-      }
-
-      setMessage(petToEdit ? "Husdjur uppdaterat." : "Husdjur tillagt.");
-      setName("");
-      setType("");
-      setBirthDate("");
-      setBreed("");
-      setGender("");
-      setColor("");
-      setSelectedAvatar("");
-    } catch (error: any) {
-      console.error("Fel vid inskick:", error);
-      setMessage(
-        error?.response?.data?.error || "Det gick inte att spara husdjuret.",
-      );
-    }
+  const handleSubmit = async () => {
+    // Validate form fields
   };
-
   return (
-    <form onSubmit={handleSubmit} className="pet-form-shell">
-      <header className="pet-form-hero">
-        <h2>{petToEdit ? "Redigera husdjur" : "Lagg till ett husdjur"}</h2>
-        <p>
-          Fyll i information om ditt nya familjemedlem
-          <span className="pet-form-heart"></span>
-        </p>
-      </header>
+    <View style={styles.form}>
+      <Text style={styles.heading}>
+        Lägg till husdjur
+      </Text>
 
-      <section className="pet-form-card">
-        <h3>
-          <span className="pet-form-badge">i</span>
-          Grundinformation
-        </h3>
+      <View style={styles.field}>
+        <Text style={styles.label}>Namn</Text>
 
-        <label className="pet-form-field">
-          <span className="pet-form-field-icon">*</span>
-          <input
-            type="text"
-            placeholder="Namn"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </label>
+        <TextInput
+          value={name}
+          onChangeText={setName}
+          style={styles.input}
+          placeholder="Djurets namn"
+          placeholderTextColor="#9a9a9a"
+        />
+      </View>
+      <View style={styles.field}>
+        <Text style={styles.label}>
+          Typ av djur
+        </Text>
 
-        <label className="pet-form-field">
-          <span className="pet-form-field-icon">D</span>
-          <input
-            type="date"
-            value={birthDate}
-            onChange={(e) => setBirthDate(e.target.value)}
-          />
-        </label>
+        <TextInput
+          value={type}
+          onChangeText={setType}
+          style={styles.input}
+          placeholder="Hund, katt, kanin..."
+          placeholderTextColor="#9a9a9a"
+        />
+      </View>
+      <View style={styles.field}>
+        <Text style={styles.label}>
+          Födelsedatum
+        </Text>
 
-        <label className="pet-form-field">
-          <span className="pet-form-field-icon">T</span>
-          <select value={type} onChange={(e) => setType(e.target.value)}>
-            <option value="">Typ av djur</option>
-            {petTypes.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
-          </select>
-        </label>
+        <TextInput
+          value={birthDate}
+          onChangeText={setBirthDate}
+          style={styles.input}
+          placeholder="ÅÅÅÅ-MM-DD"
+          placeholderTextColor="#9a9a9a"
+        />
+      </View>
+      <View style={styles.field}>
+        <Text style={styles.label}>Ras</Text>
 
-        <label className="pet-form-field">
-          <span className="pet-form-field-icon">R</span>
-          <input
-            type="text"
-            placeholder="Ras"
-            value={breed}
-            onChange={(e) => setBreed(e.target.value)}
-          />
-        </label>
+        <TextInput
+          value={breed}
+          onChangeText={setBreed}
+          style={styles.input}
+          placeholder="Till exempel labrador"
+          placeholderTextColor="#9a9a9a"
+        />
+      </View>
+      <View style={styles.field}>
+        <Text style={styles.label}>Kön</Text>
 
-        <label className="pet-form-field">
-          <span className="pet-form-field-icon">F</span>
-          <input
-            type="text"
-            placeholder="Farg"
-            value={color}
-            onChange={(e) => setColor(e.target.value)}
-          />
-        </label>
+        <TextInput
+          value={gender}
+          onChangeText={setGender}
+          style={styles.input}
+          placeholder="Hona, hane eller okänt"
+          placeholderTextColor="#9a9a9a"
+        />
+      </View>
+      <View style={styles.field}>
+        <Text style={styles.label}>Färg</Text>
 
-        <label className="pet-form-field">
-          <span className="pet-form-field-icon">K</span>
-          <select value={gender} onChange={(e) => setGender(e.target.value)}>
-            <option value="">Kon</option>
-            {genderOptions.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
-          </select>
-        </label>
-      </section>
-
-      <section className="pet-form-avatar-section">
-        <h3>Profilbild</h3>
-        <AvatarUploader onAvatarChange={setSelectedAvatar} />
-      </section>
-
-      <button className="pet-form-submit" type="submit">
-        {petToEdit ? "Spara andringar" : "Lagg till husdjur"}
-      </button>
-
-      {message && <p className="pet-form-message">{message}</p>}
-    </form>
+        <TextInput
+          value={color}
+          onChangeText={setColor}
+          style={styles.input}
+          placeholder="Till exempel brun"
+          placeholderTextColor="#9a9a9a"
+        />
+      </View>
+      <Pressable
+        onPress={handleSubmit}
+        disabled={loading}
+        style={styles.button}
+      >
+        <Text style={styles.buttonText}>
+          {loading
+            ? "Sparar..."
+            : "Lägg till husdjur"}
+        </Text>
+      </Pressable>
+      {message ? (
+        <Text style={styles.message}>
+          {message}
+        </Text>
+      ) : null}
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  form: {
+    width: "100%",
+    gap: 12,
+  },
+
+  heading: {
+    fontSize: 24,
+    fontFamily: "CormorantGaramond",
+    color: "#2d696f",
+    textAlign: "center",
+  },
+
+  field: {
+    gap: 6,
+  },
+
+  label: {
+    fontFamily: "Quicksand",
+    color: "#2d696f",
+    fontWeight: "600",
+  },
+
+  input: {
+    minHeight: 44,
+    borderWidth: 1,
+    borderColor: "#e9e5de",
+    borderRadius: 999,
+    paddingHorizontal: 16,
+    backgroundColor: "#fefdf8",
+    color: "#2d696f",
+    fontFamily: "Quicksand",
+  },
+  button: {
+    minHeight: 48,
+    borderRadius: 999,
+    backgroundColor: "#2d696f",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 8,
+  },
+
+  buttonText: {
+    color: "#ffffff",
+    fontFamily: "Quicksand",
+    fontWeight: "700",
+  },
+
+  message: {
+    textAlign: "center",
+    color: "#2d696f",
+    fontFamily: "Quicksand",
+  },
+});
