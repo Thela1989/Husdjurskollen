@@ -5,6 +5,7 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useState } from "react";
+import { useWindowDimensions } from "react-native";
 import {
   Pressable,
   StyleSheet,
@@ -33,6 +34,8 @@ export default function UserForm({
   email = "",
 }: Props) {
   const router = useRouter();
+  const { height } = useWindowDimensions();
+  const isSmallScreen = height <= 700;
 
   const [formName, setFormName] = useState(name);
   const [formEmail, setFormEmail] =
@@ -100,8 +103,18 @@ export default function UserForm({
   };
 
   return (
-    <View style={styles.form}>
-      <Text style={styles.heading}>
+    <View
+      style={[
+        styles.form,
+        isSmallScreen && styles.formSmall,
+      ]}
+    >
+      <Text
+        style={[
+          styles.heading,
+          isSmallScreen && styles.headingSmall,
+        ]}
+      >
         {mode === "register" && "Registrera"}
         {mode === "login" && "Logga in"}
         {mode === "edit" && "Redigera användare"}
@@ -114,7 +127,10 @@ export default function UserForm({
           <TextInput
             value={formName}
             onChangeText={setFormName}
-            style={styles.input}
+            style={[
+              styles.input,
+              isSmallScreen && styles.inputSmall,
+            ]}
             placeholderTextColor="#9a9a9a"
           />
         </View>
@@ -139,7 +155,13 @@ export default function UserForm({
             Lösenord
           </Text>
 
-          <View style={styles.passwordContainer}>
+          <View
+            style={[
+              styles.passwordContainer,
+              isSmallScreen &&
+                styles.passwordContainerSmall,
+            ]}
+          >
             <TextInput
               value={password}
               onChangeText={setPassword}
@@ -178,9 +200,11 @@ export default function UserForm({
       >
         <LinearGradient
           colors={["#2d696f", "#3c7f86"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.submitButton}
+          style={[
+            styles.submitButton,
+            isSmallScreen &&
+              styles.submitButtonSmall,
+          ]}
         >
           <Text style={styles.submitText}>
             {loading
@@ -340,5 +364,27 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontFamily: "Quicksand",
     fontWeight: "600",
+  },
+  formSmall: {
+    gap: 7,
+  },
+
+  headingSmall: {
+    fontSize: 22,
+    lineHeight: 26,
+    marginBottom: 4,
+  },
+
+  inputSmall: {
+    minHeight: 40,
+    paddingVertical: 7,
+  },
+
+  passwordContainerSmall: {
+    minHeight: 40,
+  },
+
+  submitButtonSmall: {
+    minHeight: 42,
   },
 });
