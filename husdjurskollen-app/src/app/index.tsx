@@ -30,13 +30,6 @@ export default function HomeScreen() {
   const [showLogin, setShowLogin] =
     useState(true);
 
-  /*
-   * Storlekarna räknas ut från skärmens höjd.
-   * På en liten mobil, t.ex. iPhone SE,
-   * blir de mindre automatiskt.
-   * På större mobiler växer de mjukt.
-   */
-
   const titleSize = clamp(height * 0.04, 24, 32);
 
   const pawSize = clamp(height * 0.042, 25, 34);
@@ -330,8 +323,7 @@ const styles = StyleSheet.create({
 
   startTitle: {
     color: "#2d696f",
-    fontFamily: "CormorantGaramond",
-    fontWeight: "600",
+    fontFamily: "CormorantGaramond_600SemiBold",
   },
 
   startTitlePaw: {
@@ -342,7 +334,7 @@ const styles = StyleSheet.create({
     color: "#2d696f",
     textAlign: "center",
     marginTop: 2,
-    fontFamily: "Quicksand",
+    fontFamily: "Quicksand_400Regular",
   },
 
   startHeroImage: {
@@ -413,8 +405,7 @@ const styles = StyleSheet.create({
   authTabText: {
     color: "#2d696f",
     fontSize: 13,
-    fontWeight: "700",
-    fontFamily: "Quicksand",
+    fontFamily: "Quicksand_400Regular",
   },
 
   divider: {
@@ -437,11 +428,11 @@ const styles = StyleSheet.create({
   noAccountText: {
     textAlign: "center",
     color: "#54615e",
-    fontFamily: "Quicksand",
+    fontFamily: "Quicksand_400Regular",
   },
 
   registerLink: {
     color: "#2d696f",
-    fontWeight: "600",
+    fontFamily: "Quicksand_600SemiBold",
   },
 });
