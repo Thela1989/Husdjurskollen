@@ -30,13 +30,13 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.startPage}>
-      <Header />
       <ScrollView
         contentContainerStyle={
           styles.startPageContent
         }
         showsVerticalScrollIndicator={false}
       >
+        <Header />
         <View style={styles.startHero}>
           <View style={styles.startTitleArea}>
             <View
@@ -64,7 +64,6 @@ export default function HomeScreen() {
             resizeMode="cover"
           />
         </View>
-
         <View style={styles.authCard}>
           <View style={styles.authTabs}>
             <Pressable
@@ -110,15 +109,22 @@ export default function HomeScreen() {
             <View style={styles.dividerLine} />
           </View>
 
-          <Text style={styles.noAccountText}>
-            Har du inget konto?{" "}
-            <Text
-              style={styles.registerLink}
-              onPress={handleRegisterClick}
-            >
-              Registrera dig!
+          {showLogin ? (
+            <Text style={styles.noAccountText}>
+              Har du inget konto?{" "}
+              <Text
+                style={styles.registerLink}
+                onPress={handleRegisterClick}
+              >
+                Registrera dig!
+              </Text>
             </Text>
-          </Text>
+          ) : (
+            <Text style={styles.noAccountText}>
+              Skapa ditt konto och kom igång med
+              Husdjurskollen.
+            </Text>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>

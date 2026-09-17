@@ -223,11 +223,8 @@ const styles = StyleSheet.create({
     marginTop: 0,
     marginBottom: 16,
     textAlign: "center",
-
-    // Samma fontfamilj som gamla CSS när fonten är laddad.
-    fontFamily: "CormorantGaramond",
+    fontFamily: "CormorantGaramond_600SemiBold",
     fontSize: 28,
-    fontWeight: "600",
   },
 
   field: {
@@ -237,25 +234,19 @@ const styles = StyleSheet.create({
 
   label: {
     color: "#2d696f",
-    fontFamily: "Quicksand",
-    fontWeight: "600",
+    fontFamily: "Quicksand_600SemiBold",
   },
-
   input: {
     width: "100%",
     minHeight: 48,
     borderRadius: 999,
-
     backgroundColor: "#fefdf8",
     borderWidth: 1,
     borderColor: "#e9e5de",
-
     color: "#2d696f",
-
     paddingVertical: 12.8,
     paddingHorizontal: 16,
-
-    fontFamily: "Quicksand",
+    fontFamily: "Quicksand_400Regular",
   },
 
   passwordContainer: {
@@ -275,14 +266,11 @@ const styles = StyleSheet.create({
   passwordInput: {
     flex: 1,
     minHeight: 48,
-
     color: "#2d696f",
-
     paddingVertical: 12.8,
     paddingLeft: 16,
     paddingRight: 44,
-
-    fontFamily: "Quicksand",
+    fontFamily: "Quicksand_400Regular",
   },
 
   eyeButton: {
@@ -324,10 +312,8 @@ const styles = StyleSheet.create({
 
   submitText: {
     color: "#ffffff",
-
-    fontFamily: "CormorantGaramond",
-    fontSize: 21.6,
-    fontWeight: "600",
+    fontFamily: "Quicksand_600SemiBold",
+    fontSize: 20,
   },
 
   submitIcon: {
@@ -338,7 +324,6 @@ const styles = StyleSheet.create({
   message: {
     color: "#2d696f",
     textAlign: "center",
-    fontFamily: "Quicksand",
-    fontWeight: "600",
+    fontFamily: "Quicksand_600SemiBold",
   },
 });
