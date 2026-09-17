@@ -104,8 +104,6 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.startPage}>
-      <Header />
-
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={
@@ -114,6 +112,7 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         bounces={false}
       >
+        <Header />
         {/* HERO */}
         <View style={styles.startHero}>
           <View style={styles.startTitleArea}>
