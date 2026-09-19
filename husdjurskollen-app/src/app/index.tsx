@@ -12,6 +12,7 @@ import {
 import Header from "@/components/Header";
 import UserForm from "@/components/user/UserForm";
 
+import Ionicons from "@expo/vector-icons/Ionicons";
 export default function HomeScreen() {
   const [showRegister, setShowRegister] =
     useState(false);
@@ -46,9 +47,11 @@ export default function HomeScreen() {
                 Husdjurskollen
               </Text>
 
-              <Text style={styles.startTitlePaw}>
-                🐾
-              </Text>
+              <Ionicons
+                name="paw-sharp"
+                size={24}
+                color="#2d696f"
+              />
             </View>
 
             <Text style={styles.startSubtitle}>

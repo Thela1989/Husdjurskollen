@@ -42,6 +42,9 @@ export default function UserForm({
   const [showPassword, setShowPassword] =
     useState(false);
   const [loading, setLoading] = useState(false);
+  const [messageType, setMessageType] = useState<
+    "success" | "error" | null
+  >(null);
 
   const handleSubmit = async () => {
     try {
@@ -61,6 +64,10 @@ export default function UserForm({
           });
 
         if (error) throw error;
+        setMessage(
+          "Registrering lyckades. Kontrollera din e-post för att bekräfta kontot.",
+        );
+        setMessageType("success");
 
         onRegisterDone?.();
       }
@@ -74,7 +81,8 @@ export default function UserForm({
 
         if (error) throw error;
 
-        setMessage("Inloggad ✅");
+        setMessage("Inloggning");
+        setMessageType("success");
       }
 
       if (mode === "edit") {
@@ -88,12 +96,14 @@ export default function UserForm({
 
         if (error) throw error;
 
-        setMessage("Användare uppdaterad ✅");
+        setMessage("Användare uppdaterad");
+        setMessageType("success");
         onEditDone?.();
       }
     } catch (error) {
       console.error(error);
-      setMessage("Något gick fel ❌");
+      setMessage("Något gick fel");
+      setMessageType("error");
     } finally {
       setLoading(false);
     }
@@ -204,9 +214,25 @@ export default function UserForm({
       </Pressable>
 
       {message ? (
-        <Text style={styles.message}>
-          {message}
-        </Text>
+        <View style={styles.messageBox}>
+          <Ionicons
+            name={
+              messageType === "success"
+                ? "checkmark-circle-outline"
+                : "alert-circle-outline"
+            }
+            size={22}
+            color={
+              messageType === "success"
+                ? "#2d696f"
+                : "#b44a4a"
+            }
+          />
+
+          <Text style={styles.message}>
+            {message}
+          </Text>
+        </View>
       ) : null}
     </View>
   );
@@ -325,5 +351,12 @@ const styles = StyleSheet.create({
     color: "#2d696f",
     textAlign: "center",
     fontFamily: "Quicksand_600SemiBold",
+  },
+  messageBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    marginTop: 6,
   },
 });
