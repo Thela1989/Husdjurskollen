@@ -62,6 +62,10 @@ export default function UserForm({
 
         if (error) throw error;
 
+        setMessage(
+          "Kontot är skapat! Kolla din e-post och bekräfta adressen för att fortsätta.",
+        );
+
         onRegisterDone?.();
       }
 
@@ -75,6 +79,7 @@ export default function UserForm({
         if (error) throw error;
 
         setMessage("Inloggad ✅");
+        router.replace("/account");
       }
 
       if (mode === "edit") {
