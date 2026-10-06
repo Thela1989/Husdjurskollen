@@ -55,23 +55,6 @@ export default function Header() {
       <View style={styles.icons}>
         <Pressable
           style={styles.iconButton}
-          accessibilityLabel="Notifieringar"
-        >
-          <Svg
-            width={22}
-            height={22}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="#2d696f"
-            strokeWidth={2.2}
-          >
-            <Path d="M15 17h5l-1.4-1.4a2 2 0 0 1-.6-1.4V11a6 6 0 1 0-12 0v3.2c0 .5-.2 1-.6 1.4L4 17h5" />
-            <Path d="M10 18a2 2 0 0 0 4 0" />
-          </Svg>
-        </Pressable>
-
-        <Pressable
-          style={styles.iconButton}
           accessibilityLabel="Öppna meny"
         >
           <Svg
