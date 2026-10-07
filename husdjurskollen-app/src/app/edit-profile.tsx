@@ -55,6 +55,10 @@ export default function EditProfile() {
       error: userError,
     } = await supabase.auth.getUser();
 
+    if (avatarUri) {
+      await uploadAvatar();
+    }
+
     if (userError || !user) return;
 
     const { error } = await supabase
@@ -68,7 +72,10 @@ export default function EditProfile() {
       console.log(error);
       return;
     }
-    alert("profil sparad");
+
+    if (avatarUri) {
+      await uploadAvatar();
+    }
 
     const { error: emailError } =
       await supabase.auth.updateUser({
@@ -79,6 +86,7 @@ export default function EditProfile() {
       alert(emailError);
       return;
     }
+    alert("profil sparad");
   };
 
   const handleChangePhoto = async () => {
@@ -102,6 +110,28 @@ export default function EditProfile() {
       data: { user },
       error: userError,
     } = await supabase.auth.getUser();
+
+    if (userError || !user) return;
+
+    const response = await fetch(avatarUri);
+    const arrayBuffer =
+      await response.arrayBuffer();
+
+    const filepath = `${user.id}/avatar.jpg`;
+
+    const { error } = await supabase.storage
+      .from("avatars")
+      .upload(filepath, arrayBuffer, {
+        contentType: "image/jpeg",
+        upsert: true,
+      });
+
+    if (error) {
+      console.log("Fel vid uppladdning:", error);
+      return;
+    }
+
+    console.log("Profilbild uppladdad:");
   };
 
   return (
@@ -145,12 +175,13 @@ export default function EditProfile() {
       </Pressable>
       <View style={styles.field}>
         <Text style={styles.label}>Namn</Text>
-
-        <TextInput
-          value={name}
-          onChangeText={setName}
-          style={styles.input}
-        />
+        <View>
+          <TextInput
+            value={name}
+            onChangeText={setName}
+            style={styles.input}
+          />
+        </View>
       </View>
       <View style={styles.field}>
         <Text style={styles.label}>Epost</Text>
