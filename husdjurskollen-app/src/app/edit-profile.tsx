@@ -175,24 +175,37 @@ export default function EditProfile() {
       </Pressable>
       <View style={styles.field}>
         <Text style={styles.label}>Namn</Text>
-        <View>
+
+        <View style={styles.inputContainer}>
           <TextInput
             value={name}
             onChangeText={setName}
-            style={styles.input}
+            style={styles.inputWithIcon}
+          />
+          <Ionicons
+            name="person-outline"
+            size={20}
+            color="#2d696f"
           />
         </View>
       </View>
       <View style={styles.field}>
-        <Text style={styles.label}>Epost</Text>
+        <Text style={styles.label}>E-post</Text>
 
-        <TextInput
-          value={email}
-          onChangeText={setEmail}
-          style={styles.input}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
+        <View style={styles.inputContainer}>
+          <TextInput
+            value={email}
+            onChangeText={setEmail}
+            style={styles.inputWithIcon}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+          <Ionicons
+            name="mail-outline"
+            size={20}
+            color="#2d696f"
+          />
+        </View>
       </View>
       <Pressable
         style={styles.saveButton}
@@ -270,8 +283,9 @@ const styles = StyleSheet.create({
   },
   field: {
     marginTop: 20,
-    marginRight: 20,
-    marginLeft: 20,
+    width: "90%",
+    maxWidth: 520,
+    alignSelf: "center",
   },
 
   label: {
@@ -279,6 +293,25 @@ const styles = StyleSheet.create({
     fontFamily: "Quicksand_600SemiBold",
     marginBottom: 6,
     marginLeft: 10,
+  },
+
+  inputContainer: {
+    width: "100%",
+    minHeight: 48,
+    borderRadius: 50,
+    backgroundColor: "#fefdf8",
+    borderWidth: 1,
+    borderColor: "#e9e5de",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    gap: 10,
+  },
+
+  inputWithIcon: {
+    flex: 1,
+    color: "#2d696f",
+    fontFamily: "Quicksand_400Regular",
   },
 
   input: {
