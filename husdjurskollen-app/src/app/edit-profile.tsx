@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   Image,
@@ -21,6 +22,11 @@ export default function EditProfile() {
     string | null
   >(null);
 
+  const router = useRouter();
+
+  const [newAvatarUri, setNewAvatarUri] =
+    useState<string | null>(null);
+
   useEffect(() => {
     const loadProfile = async () => {
       const {
@@ -29,6 +35,18 @@ export default function EditProfile() {
       } = await supabase.auth.getUser();
 
       if (userError || !user) return;
+      const filePath = `${user.id}/avatar.jpg`;
+
+      const {
+        data: avatarData,
+        error: avatarError,
+      } = await supabase.storage
+        .from("avatars")
+        .createSignedUrl(filePath, 60 * 60);
+
+      if (!avatarError && avatarData?.signedUrl) {
+        setAvatarUri(avatarData.signedUrl);
+      }
 
       setEmail(user.email ?? "");
 
@@ -50,14 +68,12 @@ export default function EditProfile() {
   }, []);
 
   const handleSave = async () => {
+    console.log("handleSave körs");
     const {
       data: { user },
       error: userError,
     } = await supabase.auth.getUser();
-
-    if (avatarUri) {
-      await uploadAvatar();
-    }
+    console.log("user hämtad:", user?.id);
 
     if (userError || !user) return;
 
@@ -73,7 +89,7 @@ export default function EditProfile() {
       return;
     }
 
-    if (avatarUri) {
+    if (newAvatarUri) {
       await uploadAvatar();
     }
 
@@ -99,12 +115,13 @@ export default function EditProfile() {
       });
 
     if (!result.canceled) {
+      setNewAvatarUri(result.assets[0].uri);
       setAvatarUri(result.assets[0].uri);
     }
   };
 
   const uploadAvatar = async () => {
-    if (!avatarUri) return;
+    if (!newAvatarUri) return;
 
     const {
       data: { user },
@@ -113,7 +130,7 @@ export default function EditProfile() {
 
     if (userError || !user) return;
 
-    const response = await fetch(avatarUri);
+    const response = await fetch(newAvatarUri);
     const arrayBuffer =
       await response.arrayBuffer();
 
@@ -215,6 +232,14 @@ export default function EditProfile() {
           Spara ändringarna
         </Text>
       </Pressable>
+      <Pressable
+        style={styles.cancelButton}
+        onPress={() => router.replace("/account")}
+      >
+        <Text style={styles.cancelButtonText}>
+          Avbryt
+        </Text>
+      </Pressable>
     </View>
   );
 }
@@ -297,8 +322,9 @@ const styles = StyleSheet.create({
 
   inputContainer: {
     width: "100%",
+
     minHeight: 48,
-    borderRadius: 50,
+    borderRadius: 60,
     backgroundColor: "#fefdf8",
     borderWidth: 1,
     borderColor: "#e9e5de",
@@ -316,6 +342,7 @@ const styles = StyleSheet.create({
 
   input: {
     minHeight: 48,
+
     borderRadius: 50,
     backgroundColor: "#fefdf8",
     borderWidth: 1,
@@ -340,5 +367,24 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontFamily: "Quicksand_600SemiBold",
     fontSize: 16,
+  },
+
+  cancelButton: {
+    minHeight: 52,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: "#e9e5de",
+
+    backgroundColor: "#fefdf8",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 12,
+    marginRight: 20,
+    marginLeft: 20,
+  },
+  cancelButtonText: {
+    fontFamily: "Quicksand_600SemiBold",
+    fontSize: 16,
+    color: "#2d696f",
   },
 });
