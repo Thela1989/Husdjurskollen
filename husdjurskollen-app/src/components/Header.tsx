@@ -1,4 +1,5 @@
 import {
+  Image,
   Pressable,
   StyleSheet,
   View,
@@ -56,6 +57,10 @@ export default function Header() {
       </Svg>
 
       <View style={styles.icons}>
+        <Image
+          source={require("../../assets/images/logo.png")}
+          style={styles.logo}
+        />
         <Pressable
           style={styles.iconButton}
           accessibilityLabel="Öppna meny"
@@ -107,15 +112,21 @@ const styles = StyleSheet.create({
 
   icons: {
     position: "absolute",
-    top: 4,
-    left: 18,
-    right: 8,
+    top: 3,
+    left: 20,
+    right: 20,
     zIndex: 2,
     flexDirection: "row",
-    justifyContent: "flex-end",
+    justifyContent: "space-between",
     alignItems: "center",
   },
   iconButton: {
     padding: 8,
+  },
+  logo: {
+    width: 30,
+    height: 30,
+    borderRadius: 20,
+    resizeMode: "contain",
   },
 });
