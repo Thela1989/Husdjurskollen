@@ -1,4 +1,5 @@
 import {
+  Image,
   Pressable,
   StyleSheet,
   View,
@@ -12,6 +13,9 @@ import Svg, {
 } from "react-native-svg";
 
 export default function Header() {
+  const handleMenuPress = () => {
+    console.log("Menu button pressed");
+  };
   return (
     <View style={styles.header}>
       <Svg
@@ -53,9 +57,14 @@ export default function Header() {
       </Svg>
 
       <View style={styles.icons}>
+        <Image
+          source={require("../../assets/images/logo.png")}
+          style={styles.logo}
+        />
         <Pressable
           style={styles.iconButton}
           accessibilityLabel="Öppna meny"
+          onPress={handleMenuPress}
         >
           <Svg
             width={24}
@@ -103,12 +112,21 @@ const styles = StyleSheet.create({
 
   icons: {
     position: "absolute",
-    top: 14,
-    left: 28,
-    right: 28,
+    top: 3,
+    left: 20,
+    right: 20,
     zIndex: 2,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+  },
+  iconButton: {
+    padding: 8,
+  },
+  logo: {
+    width: 30,
+    height: 30,
+    borderRadius: 20,
+    resizeMode: "contain",
   },
 });

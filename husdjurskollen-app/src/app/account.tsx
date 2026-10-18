@@ -1,21 +1,27 @@
-import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Image,
+  Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   View,
-  Pressable,
-  Image,
-  ScrollView,
 } from "react-native";
-import { supabase } from "@/lib/supabase";
 
 import Header from "@/components/Header";
 
 export default function Account() {
+  const router = useRouter();
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(true);
+  const [avatarUri, setAvatarUri] = useState<
+    string | null
+  >(null);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -30,6 +36,21 @@ export default function Account() {
         if (!user) {
           setLoading(false);
           return;
+        }
+
+        const filePath = `${user.id}/avatar.jpg`;
+
+        const {
+          data: avatarData,
+          error: avatarError,
+        } = await supabase.storage
+          .from("avatars")
+          .createSignedUrl(filePath, 60 * 60);
+        if (
+          !avatarError &&
+          avatarData?.signedUrl
+        ) {
+          setAvatarUri(avatarData.signedUrl);
         }
 
         const { data, error } = await supabase
@@ -67,13 +88,35 @@ export default function Account() {
       <ScrollView>
         <View style={styles.profileSection}>
           <View style={styles.avatarWrapper}>
-            <Pressable style={styles.editButton}>
-              <Ionicons
-                name="pencil"
-                size={15}
-                color="#2d696f"
-              />
-            </Pressable>
+            <View style={styles.avatarWrapper}>
+              <View style={styles.avatar}>
+                {avatarUri ? (
+                  <Image
+                    source={{ uri: avatarUri }}
+                    style={styles.avatarImage}
+                  />
+                ) : (
+                  <Ionicons
+                    name="person-outline"
+                    size={46}
+                    color="#2d696f"
+                  />
+                )}
+              </View>
+
+              <Pressable
+                style={styles.editButton}
+                onPress={() =>
+                  router.push("/edit-profile")
+                }
+              >
+                <Ionicons
+                  name="pencil"
+                  size={15}
+                  color="#2d696f"
+                />
+              </Pressable>
+            </View>
           </View>
           <View style={styles.profileText}>
             <Text style={styles.title}>
@@ -86,9 +129,14 @@ export default function Account() {
           <View style={styles.sectionHeader}>
             <View style={styles.sectionTitleRow}>
               <Ionicons
-                name="paw-outline"
+                name="paw"
                 size={22}
                 color="#2d696f"
+                style={{
+                  transform: [
+                    { rotate: "-10deg" },
+                  ],
+                }}
               />
               <Text style={styles.sectionTitle}>
                 Dina husdjur
@@ -111,6 +159,30 @@ export default function Account() {
           </View>
 
           <View style={styles.petsRow}>
+            <View style={styles.petItem}>
+              <View style={styles.petAvatar}>
+                <Ionicons
+                  name="paw"
+                  size={28}
+                  color="#2d696f"
+                />
+              </View>
+              <Text style={styles.petName}>
+                Luna
+              </Text>
+            </View>
+            <View style={styles.petItem}>
+              <View style={styles.petAvatar}>
+                <Ionicons
+                  name="paw"
+                  size={28}
+                  color="#2d696f"
+                />
+              </View>
+              <Text style={styles.petName}>
+                Max
+              </Text>
+            </View>
             <Pressable style={styles.addPetItem}>
               <View style={styles.addPetCircle}>
                 <Ionicons
@@ -235,9 +307,8 @@ const styles = StyleSheet.create({
   profileSection: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 16,
-    marginTop: 8,
-    marginBottom: 26,
+    marginBottom: 30,
+    marginLeft: 20,
   },
 
   avatarWrapper: {
@@ -245,11 +316,19 @@ const styles = StyleSheet.create({
   },
 
   avatar: {
-    width: 92,
-    height: 92,
-    borderRadius: 46,
+    width: 88,
+    height: 88,
+    borderRadius: 44,
     borderWidth: 3,
     borderColor: "#ffffff",
+    margin: 3,
+    overflow: "hidden",
+  },
+
+  avatarImage: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 44,
   },
 
   editButton: {
@@ -276,8 +355,9 @@ const styles = StyleSheet.create({
   title: {
     color: "#2d696f",
     fontFamily: "CormorantGaramond_600SemiBold",
-    fontSize: 34,
+    fontSize: 30,
     lineHeight: 38,
+    marginLeft: 20,
   },
 
   subtitle: {
@@ -290,6 +370,7 @@ const styles = StyleSheet.create({
 
   petsSection: {
     marginBottom: 22,
+    marginLeft: 15,
   },
 
   sectionHeader: {
@@ -308,7 +389,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     color: "#2d696f",
     fontFamily: "CormorantGaramond_600SemiBold",
-    fontSize: 26,
+    fontSize: 24,
   },
 
   showAllButton: {
@@ -326,6 +407,27 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
+    marginBottom: 20,
+  },
+
+  petItem: {
+    alignItems: "center",
+  },
+
+  petAvatar: {
+    width: 68,
+    height: 68,
+    borderRadius: 34,
+    backgroundColor: "#e6f0e4",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  petName: {
+    marginTop: 6,
+    color: "#2d696f",
+    fontFamily: "Quicksand_500Medium",
+    fontSize: 13,
   },
 
   addPetItem: {
@@ -354,6 +456,8 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     padding: 18,
     marginBottom: 16,
+    marginLeft: 20,
+    marginRight: 20,
   },
 
   reminderCard: {
@@ -361,6 +465,8 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     padding: 18,
     marginBottom: 16,
+    marginLeft: 20,
+    marginRight: 20,
   },
 
   safetyCard: {
@@ -368,6 +474,8 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     padding: 18,
     marginBottom: 20,
+    marginLeft: 20,
+    marginRight: 20,
   },
 
   cardHeader: {
