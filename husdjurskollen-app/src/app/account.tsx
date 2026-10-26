@@ -1,7 +1,7 @@
+import HamburgerMenu from "@/components/HamburgerMenu";
 import { supabase } from "@/lib/supabase";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -17,6 +17,7 @@ import Header from "@/components/Header";
 
 export default function Account() {
   const router = useRouter();
+  const [menuOpen, setMenuOpen] = useState(false);
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(true);
   const [avatarUri, setAvatarUri] = useState<
@@ -84,7 +85,15 @@ export default function Account() {
   }
   return (
     <View style={styles.container}>
-      <Header />
+      <Header
+        showMenu={true}
+        onMenuPress={() => setMenuOpen(true)}
+      />
+
+      <HamburgerMenu
+        visible={menuOpen}
+        onClose={() => setMenuOpen(false)}
+      />
       <ScrollView>
         <View style={styles.profileSection}>
           <View style={styles.avatarWrapper}>
