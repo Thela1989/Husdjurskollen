@@ -29,7 +29,6 @@ export default function Header({
         viewBox="0 0 390 140"
         preserveAspectRatio="none"
       >
-        {" "}
         <Defs>
           <LinearGradient
             id="headerGradient"
@@ -60,7 +59,7 @@ export default function Header({
           "
           fill="url(#headerGradient)"
         />
-      </Svg>{" "}
+      </Svg>
       <Brand
         width={220}
         height={60}
