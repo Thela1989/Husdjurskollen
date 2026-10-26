@@ -9,6 +9,8 @@ import {
   View,
 } from "react-native";
 
+import Ionicons from "react-native-vector-icons/Ionicons";
+
 import Header from "@/components/Header";
 import UserForm from "@/components/user/UserForm";
 
@@ -43,23 +45,19 @@ export default function HomeScreen() {
               style={styles.startTitleWithPaw}
             >
               <Text style={styles.startTitle}>
-                Husdjurskollen
-              </Text>
-
-              <Text style={styles.startTitlePaw}>
-                🐾
+                En enklare vardag med dina djur
               </Text>
             </View>
 
             <Text style={styles.startSubtitle}>
-              Håll koll på ditt husdjurs vardag,
+              Håll koll på dina husdjurs,
               {"\n"}
               behov och hälsa.
             </Text>
           </View>
 
           <Image
-            source={require("../../assets/images/Start-Image.jpg")}
+            source={require("../../assets/images/home-image.png")}
             style={styles.startHeroImage}
             resizeMode="cover"
           />
@@ -102,9 +100,12 @@ export default function HomeScreen() {
           <View style={styles.divider}>
             <View style={styles.dividerLine} />
 
-            <Text style={styles.dividerPaw}>
-              🐾
-            </Text>
+            <Ionicons
+              name="paw"
+              size={18}
+              color="#2d696f"
+              style={styles.dividerPaw}
+            />
 
             <View style={styles.dividerLine} />
           </View>
@@ -162,13 +163,10 @@ const styles = StyleSheet.create({
 
   startTitle: {
     color: "#2d696f",
-    fontSize: 32,
-    fontWeight: "600",
-  },
-
-  startTitlePaw: {
-    color: "#2d696f",
-    fontSize: 34,
+    fontSize: 25,
+    fontWeight: "500",
+    fontFamily: "CormorantGaramond_700Bold",
+    marginTop: 8,
   },
 
   startSubtitle: {
