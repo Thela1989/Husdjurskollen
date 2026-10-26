@@ -9,7 +9,7 @@ import {
   View,
 } from "react-native";
 
-import Ionicons from "react-native-vector-icons/Ionicons";
+import { Ionicons } from "@expo/vector-icons";
 
 import Header from "@/components/Header";
 import UserForm from "@/components/user/UserForm";
