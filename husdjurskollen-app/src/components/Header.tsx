@@ -1,5 +1,4 @@
 import {
-  Image,
   Pressable,
   StyleSheet,
   View,
@@ -12,10 +11,17 @@ import Svg, {
   Stop,
 } from "react-native-svg";
 
-export default function Header() {
-  const handleMenuPress = () => {
-    console.log("Menu button pressed");
-  };
+import Brand from "../../assets/images/brand.svg";
+
+interface HeaderProps {
+  showMenu?: boolean;
+  onMenuPress?: () => void;
+}
+
+export default function Header({
+  showMenu = false,
+  onMenuPress,
+}: HeaderProps) {
   return (
     <View style={styles.header}>
       <Svg
@@ -23,6 +29,7 @@ export default function Header() {
         viewBox="0 0 390 140"
         preserveAspectRatio="none"
       >
+        {" "}
         <Defs>
           <LinearGradient
             id="headerGradient"
@@ -41,7 +48,6 @@ export default function Header() {
             />
           </LinearGradient>
         </Defs>
-
         <Path
           d="
             M0 0
@@ -54,41 +60,48 @@ export default function Header() {
           "
           fill="url(#headerGradient)"
         />
-      </Svg>
-
+      </Svg>{" "}
+      <Brand
+        width={220}
+        height={60}
+        style={styles.brand}
+      />
       <View style={styles.icons}>
-        <Image
-          source={require("../../assets/images/logo.png")}
-          style={styles.logo}
-        />
-        <Pressable
-          style={styles.iconButton}
-          accessibilityLabel="Öppna meny"
-          onPress={handleMenuPress}
-        >
-          <Svg
-            width={24}
-            height={24}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="#2d696f"
-            strokeWidth={2.2}
+        {showMenu && (
+          <Pressable
+            style={styles.iconButton}
+            accessibilityLabel="Öppna meny"
+            onPress={onMenuPress}
           >
-            <Line x1="3" y1="6" x2="21" y2="6" />
-            <Line
-              x1="3"
-              y1="12"
-              x2="21"
-              y2="12"
-            />
-            <Line
-              x1="3"
-              y1="18"
-              x2="21"
-              y2="18"
-            />
-          </Svg>
-        </Pressable>
+            <Svg
+              width={24}
+              height={24}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#2d696f"
+              strokeWidth={2.2}
+            >
+              <Line
+                x1="3"
+                y1="6"
+                x2="21"
+                y2="6"
+              />
+              <Line
+                x1="3"
+                y1="12"
+                x2="21"
+                y2="12"
+              />
+              <Line
+                x1="3"
+                y1="18"
+                x2="21"
+                y2="18"
+              />
+            </Svg>
+          </Pressable>
+        )}
       </View>
     </View>
   );
@@ -98,7 +111,7 @@ const styles = StyleSheet.create({
   header: {
     position: "relative",
     width: "100%",
-    height: 55,
+    height: 70,
     zIndex: 10,
   },
 
@@ -107,7 +120,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     width: "100%",
-    height: 90,
+    height: 110,
   },
 
   icons: {
@@ -117,16 +130,17 @@ const styles = StyleSheet.create({
     right: 20,
     zIndex: 2,
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
     alignItems: "center",
   },
   iconButton: {
     padding: 8,
   },
-  logo: {
-    width: 30,
-    height: 30,
-    borderRadius: 20,
-    resizeMode: "contain",
+
+  brand: {
+    position: "absolute",
+    top: -6,
+    alignSelf: "center",
+    zIndex: 3,
   },
 });
