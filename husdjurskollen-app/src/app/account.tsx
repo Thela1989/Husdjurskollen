@@ -1,4 +1,5 @@
 import HamburgerMenu from "@/components/HamburgerMenu";
+import Header from "@/components/Header";
 import { supabase } from "@/lib/supabase";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -12,13 +13,13 @@ import {
   Text,
   View,
 } from "react-native";
-
-import Header from "@/components/Header";
+import HeartIcon from "../../assets/images/heart-icon.svg";
 
 export default function Account() {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [name, setName] = useState("");
+  const [pets, setPets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [avatarUri, setAvatarUri] = useState<
     string | null
@@ -37,6 +38,17 @@ export default function Account() {
         if (!user) {
           setLoading(false);
           return;
+        }
+
+        const {
+          data: petsData,
+          error: petsError,
+        } = await supabase
+          .from("pets")
+          .select("*")
+          .eq("user_id", user.id);
+        if (petsError) {
+          console.log("Pets error:", petsError);
         }
 
         const filePath = `${user.id}/avatar.jpg`;
@@ -131,6 +143,17 @@ export default function Account() {
             <Text style={styles.title}>
               Hej {name || "där"}!
             </Text>
+            <View style={styles.subtitleRow}>
+              <Text style={styles.subtitle}>
+                Så fint att du tar hand om dina
+                djur
+              </Text>
+
+              <HeartIcon
+                width={14}
+                height={14}
+              ></HeartIcon>
+            </View>
           </View>
         </View>
 
@@ -166,32 +189,40 @@ export default function Account() {
               />
             </Pressable>
           </View>
-
           <View style={styles.petsRow}>
-            <View style={styles.petItem}>
-              <View style={styles.petAvatar}>
-                <Ionicons
-                  name="paw"
-                  size={28}
-                  color="#2d696f"
-                />
+            {pets.map(pet => (
+              <View
+                key={pet.id}
+                style={styles.petItem}
+              >
+                <View
+                  style={styles.petAvatarWrapper}
+                >
+                  <View style={styles.petAvatar}>
+                    <Ionicons
+                      name="camera-outline"
+                      size={24}
+                      color="#7fa3a0"
+                    />
+                  </View>
+
+                  <Pressable
+                    style={styles.petEditButton}
+                  >
+                    <Ionicons
+                      name="pencil"
+                      size={11}
+                      color="#2d696f"
+                    />
+                  </Pressable>
+                </View>
+
+                <Text style={styles.petName}>
+                  {pet.name}
+                </Text>
               </View>
-              <Text style={styles.petName}>
-                Luna
-              </Text>
-            </View>
-            <View style={styles.petItem}>
-              <View style={styles.petAvatar}>
-                <Ionicons
-                  name="paw"
-                  size={28}
-                  color="#2d696f"
-                />
-              </View>
-              <Text style={styles.petName}>
-                Max
-              </Text>
-            </View>
+            ))}
+
             <Pressable style={styles.addPetItem}>
               <View style={styles.addPetCircle}>
                 <Ionicons
@@ -316,6 +347,7 @@ const styles = StyleSheet.create({
   profileSection: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     marginBottom: 30,
     marginLeft: 20,
   },
@@ -359,22 +391,27 @@ const styles = StyleSheet.create({
 
   profileText: {
     flex: 1,
+    marginLeft: 16,
   },
 
   title: {
     color: "#2d696f",
     fontFamily: "CormorantGaramond_600SemiBold",
-    fontSize: 30,
+    fontSize: 38,
     lineHeight: 38,
-    marginLeft: 20,
   },
 
   subtitle: {
     color: "#54615e",
-    fontFamily: "Quicksand_400Regular",
-    fontSize: 15,
-    lineHeight: 20,
-    marginTop: 4,
+    fontFamily: "Rubik_400Regular",
+    fontSize: 14,
+    lineHeight: 19,
+    marginTop: 2,
+  },
+  subtitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
   },
 
   petsSection: {
@@ -398,7 +435,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     color: "#2d696f",
     fontFamily: "CormorantGaramond_600SemiBold",
-    fontSize: 24,
+    fontSize: 34,
   },
 
   showAllButton: {
@@ -421,6 +458,24 @@ const styles = StyleSheet.create({
 
   petItem: {
     alignItems: "center",
+  },
+
+  petAvatarWrapper: {
+    position: "relative",
+  },
+
+  petEditButton: {
+    position: "absolute",
+    right: -2,
+    bottom: 0,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#e6f0e4",
+    borderWidth: 2,
+    borderColor: "#ffffff",
   },
 
   petAvatar: {
@@ -467,6 +522,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     marginLeft: 20,
     marginRight: 20,
+    boxShadow: "0px 8px 20px rgba(0,0,0,0.12)",
   },
 
   reminderCard: {
@@ -476,6 +532,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     marginLeft: 20,
     marginRight: 20,
+    boxShadow: "0px 8px 20px rgba(0,0,0,0.12)",
   },
 
   safetyCard: {
@@ -485,6 +542,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginLeft: 20,
     marginRight: 20,
+    boxShadow: "0px 8px 20px rgba(0,0,0,0.12)",
   },
 
   cardHeader: {
@@ -512,18 +570,20 @@ const styles = StyleSheet.create({
 
   reminderText: {
     color: "#9b5d49",
+    fontFamily: "SourceSans3_400Regular",
+    fontSize: 15,
   },
 
   emptyText: {
     color: "#54615e",
-    fontFamily: "Quicksand_400Regular",
-    fontSize: 14,
+    fontFamily: "SourceSans3_400Regular",
+    fontSize: 15,
   },
 
   safetyText: {
     color: "#54615e",
-    fontFamily: "Quicksand_400Regular",
-    fontSize: 14,
+    fontFamily: "SourceSans3_400Regular",
+    fontSize: 15,
     lineHeight: 20,
     marginTop: 10,
   },

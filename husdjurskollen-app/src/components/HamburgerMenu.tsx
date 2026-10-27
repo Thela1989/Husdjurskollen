@@ -80,7 +80,7 @@ export default function HamburgerMenu({
           color="#2d696f"
         />
         <Text style={styles.menuItemText}>
-          Mitt konto
+          Logga ut
         </Text>
       </Pressable>
     </View>
