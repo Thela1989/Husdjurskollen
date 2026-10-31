@@ -6,6 +6,7 @@ import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Image,
   Pressable,
   ScrollView,
@@ -24,6 +25,29 @@ export default function Account() {
   const [avatarUri, setAvatarUri] = useState<
     string | null
   >(null);
+
+  const handleLogout = async () => {
+    Alert.alert(
+      "Logga ut",
+      "Är du säker på att du vill logga ut?",
+      [
+        { text: "Avbryt", style: "cancel" },
+        {
+          text: "Logga ut",
+          style: "destructive",
+          onPress: async () => {
+            const { error } =
+              await supabase.auth.signOut();
+            if (error) {
+              console.log("Logout error:", error);
+              return;
+            }
+            router.replace("/");
+          },
+        },
+      ],
+    );
+  };
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -105,6 +129,7 @@ export default function Account() {
       <HamburgerMenu
         visible={menuOpen}
         onClose={() => setMenuOpen(false)}
+        onLogout={handleLogout}
       />
       <ScrollView>
         <View style={styles.profileSection}>

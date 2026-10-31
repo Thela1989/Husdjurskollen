@@ -3,6 +3,7 @@ import {
   StyleSheet,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, {
   Defs,
   Line,
@@ -22,6 +23,7 @@ export default function Header({
   showMenu = false,
   onMenuPress,
 }: HeaderProps) {
+  const insets = useSafeAreaInsets();
   return (
     <View style={styles.header}>
       <Svg
@@ -60,12 +62,20 @@ export default function Header({
           fill="url(#headerGradient)"
         />
       </Svg>
-      <Brand
-        width={220}
-        height={60}
-        style={styles.brand}
-      />
-      <View style={styles.icons}>
+      <View
+        style={[
+          styles.headerContent,
+          { paddingTop: insets.top },
+        ]}
+      >
+        <Brand
+          width={180}
+          height={40}
+          style={{
+            transform: [{ translateY: -4 }],
+          }}
+        />
+
         {showMenu && (
           <Pressable
             style={styles.iconButton}
@@ -110,7 +120,7 @@ const styles = StyleSheet.create({
   header: {
     position: "relative",
     width: "100%",
-    height: 70,
+    height: 95,
     zIndex: 10,
   },
 
@@ -119,27 +129,26 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     width: "100%",
-    height: 110,
+    height: 170,
   },
 
-  icons: {
-    position: "absolute",
-    top: 3,
-    left: 20,
-    right: 20,
-    zIndex: 2,
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    alignItems: "center",
-  },
   iconButton: {
+    position: "absolute",
+    right: 0,
+    bottom: 8,
     padding: 8,
   },
-
-  brand: {
+  headerContent: {
     position: "absolute",
-    top: -6,
-    alignSelf: "center",
+    top: 0,
+    left: 20,
+    right: 20,
+    height: 75,
+
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+
     zIndex: 3,
   },
 });

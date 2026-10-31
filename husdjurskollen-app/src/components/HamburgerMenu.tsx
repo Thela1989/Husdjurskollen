@@ -9,11 +9,13 @@ import {
 interface HamburgerMenuProps {
   visible: boolean;
   onClose: () => void;
+  onLogout: () => void;
 }
 
 export default function HamburgerMenu({
   visible,
   onClose,
+  onLogout,
 }: HamburgerMenuProps) {
   if (!visible) return null;
 
@@ -73,7 +75,10 @@ export default function HamburgerMenu({
         </Text>
       </Pressable>
 
-      <Pressable style={styles.menuItem}>
+      <Pressable
+        style={styles.menuItem}
+        onPress={onLogout}
+      >
         <Ionicons
           name="log-out-outline"
           size={18}
