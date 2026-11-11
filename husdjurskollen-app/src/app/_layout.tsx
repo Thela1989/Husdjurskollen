@@ -1,3 +1,4 @@
+import { StatusBar } from "expo-status-bar";
 import {
   CormorantGaramond_400Regular,
   CormorantGaramond_600SemiBold,
@@ -83,10 +84,14 @@ export default function RootLayout() {
     return null;
   }
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-      }}
-    />
+    <>
+      <StatusBar style="dark" />
+
+      <Stack
+        screenOptions={{
+          headerShown: false,
+        }}
+      />
+    </>
   );
 }
