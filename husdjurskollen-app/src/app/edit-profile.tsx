@@ -3,7 +3,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-  Image,
   Pressable,
   StyleSheet,
   Text,
@@ -11,7 +10,7 @@ import {
   View,
 } from "react-native";
 
-import * as ImagePicker from "expo-image-picker";
+import AvatarPicker from "@/components/AvatarPicker";
 
 import { supabase } from "@/lib/supabase";
 
@@ -105,21 +104,6 @@ export default function EditProfile() {
     alert("profil sparad");
   };
 
-  const handleChangePhoto = async () => {
-    const result =
-      await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ["images"],
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 0.8,
-      });
-
-    if (!result.canceled) {
-      setNewAvatarUri(result.assets[0].uri);
-      setAvatarUri(result.assets[0].uri);
-    }
-  };
-
   const uploadAvatar = async () => {
     if (!newAvatarUri) return;
 
@@ -157,39 +141,17 @@ export default function EditProfile() {
       <Text style={styles.title}>
         Redigera din profil
       </Text>
-      <Pressable
-        style={styles.avatarWrapper}
-        onPress={handleChangePhoto}
-      >
-        <View style={styles.avatar}>
-          {avatarUri ? (
-            <Image
-              source={{ uri: avatarUri }}
-              style={styles.avatarImage}
-            />
-          ) : (
-            <Ionicons
-              name="person-outline"
-              size={46}
-              color="#2d696f"
-            />
-          )}
-        </View>
+      <AvatarPicker
+        imageUri={avatarUri}
+        onImageChange={uri => {
+          setAvatarUri(uri);
+          setNewAvatarUri(uri);
+        }}
+      />
 
-        <View
-          style={styles.editAvatarButtonContainer}
-        >
-          <Ionicons
-            name="camera-outline"
-            size={15}
-            color="#ffffff"
-          />
-        </View>
-
-        <Text style={styles.changePhotoText}>
-          Byt profilbild
-        </Text>
-      </Pressable>
+      <Text style={styles.changePhotoText}>
+        Byt profilbild
+      </Text>
       <View style={styles.field}>
         <Text style={styles.label}>Namn</Text>
 
@@ -255,50 +217,6 @@ const styles = StyleSheet.create({
     color: "#2d696f",
   },
 
-  avatarWrapper: {
-    alignItems: "center",
-    marginTop: 20,
-    position: "relative",
-
-    width: 100,
-    height: 100,
-
-    alignSelf: "center",
-  },
-  avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: "#e6f0e4",
-    borderWidth: 3,
-    borderColor: "#ffffff",
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.12,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  avatarImage: {
-    width: "100%",
-    height: "100%",
-    borderRadius: 50,
-  },
-  editAvatarButtonContainer: {
-    position: "absolute",
-    right: 3,
-    bottom: 1,
-    width: 25,
-    height: 25,
-    borderRadius: 15,
-    backgroundColor: "#2d696f",
-    alignItems: "center",
-    justifyContent: "center",
-  },
   changePhotoText: {
     textAlign: "center",
     marginTop: 10,

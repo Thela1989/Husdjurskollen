@@ -1,198 +1,533 @@
-import { useEffect, useState } from "react";
-import { AvatarUploader } from "../user/AvatarUploader";
-import { api } from "../../lib/api";
+import { Ionicons } from "@expo/vector-icons";
 
-interface Pet {
-  id: number;
-  name: string;
-  type: string;
-  birth_date: string;
-  breed: string;
-  gender: string;
-  color: string;
-}
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { router } from "expo-router";
+import { useState } from "react";
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import { supabase } from "../../lib/supabase";
+import AvatarPicker from "../AvatarPicker";
+export default function PetForm() {
+  const [birthDate, setBirthDate] =
+    useState<Date | null>(null);
 
-interface Props {
-  onPetCreated: (newPet: Pet) => void;
-  ownerId: number;
-  petToEdit?: Pet;
-  onEditDone?: () => void;
-}
-
-export default function PetForm({
-  onPetCreated,
-  ownerId,
-  petToEdit,
-  onEditDone,
-}: Props) {
-  const petTypes = ["Hund", "Katt", "Kanin", "Fagel", "Annat"];
-  const genderOptions = ["Hona", "Hane", "Okant"];
-
+  const [showDatePicker, setShowDatePicker] =
+    useState(false);
   const [name, setName] = useState("");
-  const [type, setType] = useState("");
-  const [birthDate, setBirthDate] = useState("");
+
   const [breed, setBreed] = useState("");
-  const [gender, setGender] = useState("");
   const [color, setColor] = useState("");
-  const [selectedAvatar, setSelectedAvatar] = useState<string>("");
-  const [message, setMessage] = useState("");
+  const [petImage, setPetImage] = useState<
+    string | null
+  >(null);
 
-  useEffect(() => {
-    if (!petToEdit) return;
+  const [selectedType, setSelectedType] =
+    useState("");
+  const [selectedSex, setSelectedSex] =
+    useState("");
 
-    setName(petToEdit.name);
-    setType(petToEdit.type);
-    setBirthDate(new Date(petToEdit.birth_date).toISOString().split("T")[0]);
-    setBreed(petToEdit.breed);
-    setGender(petToEdit.gender);
-    setColor(petToEdit.color);
-    setSelectedAvatar(localStorage.getItem(`petAvatar:${petToEdit.id}`) || "");
-  }, [petToEdit]);
+  const petTypes = [
+    "Hund",
+    "Katt",
+    "Kanin",
+    "Annat",
+  ];
+  const sexOptions = ["Hane", "Hona", "Okänt"];
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setMessage("");
+  const handleSavePet = async () => {
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
 
-    if (!name.trim()) {
-      setMessage("Du behöver ange ett namn på djuret.");
+    if (userError) {
+      console.log(
+        "Fel när användaren hämtades:",
+        userError,
+      );
       return;
     }
 
-    const payload = {
-      name: name.trim(),
-      type: type.trim() || null,
-      birth_date: birthDate || null,
-      owner_id: ownerId,
-      breed: breed.trim() || null,
-      gender: gender.trim() || null,
-      color: color.trim() || null,
-    };
+    if (!user) {
+      console.log("Ingen inloggad användare");
+      return;
+    }
+    const { data: newPet, error } = await supabase
+      .from("pets")
+      .insert({
+        name: name.trim(),
+        type: selectedType,
+        birth_date: birthDate
+          ? birthDate.toISOString().split("T")[0]
+          : null,
+        breed: breed.trim() || null,
+        gender: selectedSex || null,
+        color: color.trim() || null,
+        owner_id: user.id,
+      })
+      .select()
+      .single();
 
-    try {
-      if (petToEdit) {
-        await api.put(`/pets/${petToEdit.id}`, payload);
-
-        if (selectedAvatar) {
-          localStorage.setItem(`petAvatar:${petToEdit.id}`, selectedAvatar);
-        }
-
-        onEditDone?.();
-      } else {
-        const response = await api.post("/pets", payload);
-
-        if (selectedAvatar && response.data?.id) {
-          localStorage.setItem(`petAvatar:${response.data.id}`, selectedAvatar);
-        }
-
-        onPetCreated(response.data);
-      }
-
-      setMessage(petToEdit ? "Husdjur uppdaterat." : "Husdjur tillagt.");
-      setName("");
-      setType("");
-      setBirthDate("");
-      setBreed("");
-      setGender("");
-      setColor("");
-      setSelectedAvatar("");
-    } catch (error: any) {
-      console.error("Fel vid inskick:", error);
-      setMessage(
-        error?.response?.data?.error || "Det gick inte att spara husdjuret.",
+    if (error) {
+      console.log(
+        "Fel när husdjuret sparades:",
+        error,
       );
+      return;
+    }
+
+    console.log("Nytt husdjur:", newPet);
+
+    if (petImage && newPet?.id) {
+      const response = await fetch(petImage);
+      const arrayBuffer =
+        await response.arrayBuffer();
+
+      const filePath = `${user.id}/${newPet.id}/avatar.jpg`;
+
+      const { error: uploadError } =
+        await supabase.storage
+          .from("pet-avatars")
+          .upload(filePath, arrayBuffer, {
+            contentType: "image/jpeg",
+            upsert: true,
+          });
+
+      if (uploadError) {
+        console.log(
+          "Fel när djurbilden laddades upp:",
+          uploadError,
+        );
+      }
+      const { error: updateError } =
+        await supabase
+          .from("pets")
+          .update({
+            image_path: filePath,
+          })
+          .eq("id", newPet.id);
+
+      if (updateError) {
+        console.log(
+          "Fel när bildsökvägen sparades:",
+          updateError,
+        );
+      }
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="pet-form-shell">
-      <header className="pet-form-hero">
-        <h2>{petToEdit ? "Redigera husdjur" : "Lagg till ett husdjur"}</h2>
-        <p>
-          Fyll i information om ditt nya familjemedlem
-          <span className="pet-form-heart"></span>
-        </p>
-      </header>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.content}
+      showsVerticalScrollIndicator={false}
+    >
+      <Text style={styles.title}>
+        Lägg till ett husdjur
+      </Text>
+      <Text style={styles.subtitle}>
+        Fyll i ditt husdjurs uppgifter för att
+        komma igång.
+      </Text>
 
-      <section className="pet-form-card">
-        <h3>
-          <span className="pet-form-badge">i</span>
-          Grundinformation
-        </h3>
+      <View style={styles.avatarSection}>
+        <AvatarPicker
+          imageUri={petImage}
+          onImageChange={setPetImage}
+        />
+      </View>
 
-        <label className="pet-form-field">
-          <span className="pet-form-field-icon">*</span>
-          <input
-            type="text"
-            placeholder="Namn"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+      <View style={styles.card}>
+        <View style={styles.labelRow}>
+          <Ionicons
+            name="person-outline"
+            size={18}
+            color="#2d696f"
           />
-        </label>
+          <Text style={styles.label}>Namn</Text>
+        </View>
 
-        <label className="pet-form-field">
-          <span className="pet-form-field-icon">D</span>
-          <input
-            type="date"
-            value={birthDate}
-            onChange={(e) => setBirthDate(e.target.value)}
+        <TextInput
+          value={name}
+          onChangeText={setName}
+          style={styles.input}
+          placeholder="T.ex. Luna"
+          placeholderTextColor="#93a09d"
+        />
+      </View>
+
+      <View style={styles.card}>
+        <View style={styles.labelRow}>
+          <Ionicons
+            name="paw-outline"
+            size={18}
+            color="#2d696f"
           />
-        </label>
+          <Text style={styles.label}>
+            Djurslag
+          </Text>
+        </View>
 
-        <label className="pet-form-field">
-          <span className="pet-form-field-icon">T</span>
-          <select value={type} onChange={(e) => setType(e.target.value)}>
-            <option value="">Typ av djur</option>
-            {petTypes.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
-          </select>
-        </label>
+        <View style={styles.chipRow}>
+          {petTypes.map(item => {
+            const active = selectedType === item;
 
-        <label className="pet-form-field">
-          <span className="pet-form-field-icon">R</span>
-          <input
-            type="text"
-            placeholder="Ras"
+            return (
+              <Pressable
+                key={item}
+                onPress={() =>
+                  setSelectedType(item)
+                }
+                style={[
+                  styles.chip,
+                  active && styles.chipActive,
+                ]}
+              >
+                {active && (
+                  <Ionicons
+                    name="checkmark"
+                    size={14}
+                    color="#2d696f"
+                    style={styles.chipIcon}
+                  />
+                )}
+                <Text
+                  style={[
+                    styles.chipText,
+                    active &&
+                      styles.chipTextActive,
+                  ]}
+                >
+                  {item}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      </View>
+
+      <View style={styles.card}>
+        <View style={styles.labelRow}>
+          <Ionicons
+            name="pricetag-outline"
+            size={18}
+            color="#2d696f"
+          />
+          <Text style={styles.label}>Ras</Text>
+        </View>
+
+        <View style={styles.inputWithIcon}>
+          <TextInput
             value={breed}
-            onChange={(e) => setBreed(e.target.value)}
+            onChangeText={setBreed}
+            style={styles.inputField}
+            placeholder="T.ex. Labrador"
+            placeholderTextColor="#93a09d"
           />
-        </label>
+        </View>
+      </View>
 
-        <label className="pet-form-field">
-          <span className="pet-form-field-icon">F</span>
-          <input
-            type="text"
-            placeholder="Farg"
+      <View style={styles.card}>
+        <View style={styles.labelRow}>
+          <Ionicons
+            name="calendar-outline"
+            size={18}
+            color="#2d696f"
+          />
+          <Text style={styles.label}>
+            Födelsedatum
+          </Text>
+        </View>
+
+        <Pressable
+          style={styles.inputWithIcon}
+          onPress={() => setShowDatePicker(true)}
+        >
+          <Text style={styles.inputField}>
+            {birthDate
+              ? birthDate.toLocaleDateString(
+                  "sv-SE",
+                )
+              : "Välj datum"}
+          </Text>
+
+          <Ionicons
+            name="calendar-outline"
+            size={18}
+            color="#7a8a87"
+          />
+        </Pressable>
+
+        {showDatePicker && (
+          <DateTimePicker
+            value={birthDate ?? new Date()}
+            mode="date"
+            maximumDate={new Date()}
+            onValueChange={(
+              event,
+              selectedDate,
+            ) => {
+              setBirthDate(selectedDate);
+              setShowDatePicker(false);
+            }}
+            onDismiss={() => {
+              setShowDatePicker(false);
+            }}
+          />
+        )}
+      </View>
+
+      <View style={styles.card}>
+        <View style={styles.labelRow}>
+          <Ionicons
+            name="male-female-outline"
+            size={18}
+            color="#2d696f"
+          />
+          <Text style={styles.label}>Kön</Text>
+        </View>
+
+        <View style={styles.chipRow}>
+          {sexOptions.map(item => {
+            const active = selectedSex === item;
+
+            return (
+              <Pressable
+                key={item}
+                onPress={() =>
+                  setSelectedSex(item)
+                }
+                style={[
+                  styles.chip,
+                  active && styles.chipActive,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.chipText,
+                    active &&
+                      styles.chipTextActive,
+                  ]}
+                >
+                  {item}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      </View>
+
+      <View style={styles.card}>
+        <View style={styles.labelRow}>
+          <Ionicons
+            name="color-filter-outline"
+            size={18}
+            color="#2d696f"
+          />
+          <Text style={styles.label}>Färg</Text>
+        </View>
+
+        <View style={styles.inputWithIcon}>
+          <TextInput
             value={color}
-            onChange={(e) => setColor(e.target.value)}
+            onChangeText={setColor}
+            style={styles.inputField}
+            placeholder="T.ex. Brun"
+            placeholderTextColor="#93a09d"
           />
-        </label>
+        </View>
+      </View>
 
-        <label className="pet-form-field">
-          <span className="pet-form-field-icon">K</span>
-          <select value={gender} onChange={(e) => setGender(e.target.value)}>
-            <option value="">Kon</option>
-            {genderOptions.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
-          </select>
-        </label>
-      </section>
+      <Pressable
+        style={styles.saveButton}
+        onPress={handleSavePet}
+      >
+        <Ionicons
+          name="paw"
+          size={18}
+          color="#ffffff"
+        />
+        <Text style={styles.saveButtonText}>
+          Spara husdjur
+        </Text>
+      </Pressable>
 
-      <section className="pet-form-avatar-section">
-        <h3>Profilbild</h3>
-        <AvatarUploader onAvatarChange={setSelectedAvatar} />
-      </section>
-
-      <button className="pet-form-submit" type="submit">
-        {petToEdit ? "Spara andringar" : "Lagg till husdjur"}
-      </button>
-
-      {message && <p className="pet-form-message">{message}</p>}
-    </form>
+      <Pressable
+        style={styles.cancelButton}
+        onPress={() => router.push("/account")}
+      >
+        <Text style={styles.cancelButtonText}>
+          Avbryt
+        </Text>
+      </Pressable>
+    </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fef9f3",
+  },
+
+  content: {
+    paddingHorizontal: 18,
+    paddingTop: 18,
+    paddingBottom: 32,
+  },
+
+  title: {
+    color: "#2d696f",
+    fontFamily: "CormorantGaramond_700Bold",
+    fontSize: 34,
+    textAlign: "center",
+    marginTop: 6,
+  },
+
+  subtitle: {
+    color: "#54615e",
+    fontFamily: "Rubik_400Regular",
+    fontSize: 14,
+    textAlign: "center",
+    marginTop: 6,
+    marginBottom: 18,
+  },
+
+  avatarSection: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+
+  card: {
+    backgroundColor: "#edf6ea",
+    borderRadius: 18,
+    padding: 14,
+    marginBottom: 14,
+
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+
+    elevation: 3,
+  },
+
+  labelRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 10,
+  },
+
+  label: {
+    color: "#2d696f",
+    fontFamily: "Quicksand_600SemiBold",
+    fontSize: 16,
+  },
+
+  input: {
+    minHeight: 42,
+    backgroundColor: "#fffdf9",
+    borderWidth: 1,
+    borderColor: "#e6e1d9",
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    fontFamily: "Rubik_400Regular",
+    color: "#2d696f",
+  },
+
+  inputWithIcon: {
+    minHeight: 42,
+    backgroundColor: "#fffdf9",
+    borderWidth: 1,
+    borderColor: "#e6e1d9",
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  inputField: {
+    flex: 1,
+    fontFamily: "Rubik_400Regular",
+    color: "#2d696f",
+  },
+
+  chipRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+
+  chip: {
+    minHeight: 36,
+    paddingHorizontal: 14,
+    borderRadius: 999,
+    backgroundColor: "#fffdf9",
+    borderWidth: 1,
+    borderColor: "#e6e1d9",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  chipActive: {
+    backgroundColor: "#d9ead2",
+    borderColor: "#c8ddbf",
+  },
+
+  chipIcon: {
+    marginRight: 4,
+  },
+
+  chipText: {
+    color: "#54615e",
+    fontFamily: "Quicksand_500Medium",
+    fontSize: 14,
+  },
+
+  chipTextActive: {
+    color: "#2d696f",
+  },
+
+  saveButton: {
+    minHeight: 52,
+    borderRadius: 999,
+    backgroundColor: "#2d696f",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    marginTop: 8,
+  },
+
+  saveButtonText: {
+    color: "#ffffff",
+    fontFamily: "Quicksand_600SemiBold",
+    fontSize: 16,
+  },
+
+  cancelButton: {
+    minHeight: 48,
+    borderRadius: 999,
+    backgroundColor: "#eef6ea",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 10,
+  },
+
+  cancelButtonText: {
+    color: "#2d696f",
+    fontFamily: "Quicksand_600SemiBold",
+    fontSize: 15,
+  },
+});
