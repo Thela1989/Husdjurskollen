@@ -2,7 +2,6 @@ import { useState } from "react";
 import {
   Image,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -31,7 +30,7 @@ export default function HomeScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.startPage}>
+    <View style={styles.startPage}>
       <ScrollView
         contentContainerStyle={
           styles.startPageContent
@@ -50,7 +49,7 @@ export default function HomeScreen() {
             </View>
 
             <Text style={styles.startSubtitle}>
-              Håll koll på dina husdjurs,
+              Håll koll på dina husdjurs
               {"\n"}
               behov och hälsa.
             </Text>
@@ -128,7 +127,7 @@ export default function HomeScreen() {
           )}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -148,6 +147,7 @@ const styles = StyleSheet.create({
     width: "100%",
     alignItems: "center",
     justifyContent: "center",
+    marginTop: 20,
   },
 
   startTitleArea: {

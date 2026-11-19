@@ -70,7 +70,7 @@ export default function Account() {
         } = await supabase
           .from("pets")
           .select("*")
-          .eq("user_id", user.id);
+          .eq("owner_id", user.id);
         if (petsError) {
           console.log("Pets error:", petsError);
         }
@@ -248,7 +248,12 @@ export default function Account() {
               </View>
             ))}
 
-            <Pressable style={styles.addPetItem}>
+            <Pressable
+              style={styles.addPetItem}
+              onPress={() =>
+                router.push("/add-pet" as never)
+              }
+            >
               <View style={styles.addPetCircle}>
                 <Ionicons
                   name="add"
